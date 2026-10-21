@@ -3359,6 +3359,782 @@ K.push({id:'birthday-paradox',batch:'E',title:'THE BIRTHDAY PARADOX',topic:'Mind
     ctext(n+' PEOPLE',30,'#e5e7eb');const pc=E_bday(n)*100;ctext((n>=70?'99.9':String(Math.floor(pc)))+'%',44,'#4ade80',3);if(n>=70)hit('w','right');if(lt<3600&&a.every(100,'t2')>=0)a.sfx('tick')}}}
 });
 
+/* ====================================================================== */
+/* BATCH F: Animals and Tech                                              */
+/* ====================================================================== */
+function F_ell(cx,cy,rx,ry,c){if(ry<1){R(cx-rx,cy,2*rx+1,1,c);return}for(let dy=-ry;dy<=ry;dy++){const w=Math.round(rx*Math.sqrt(Math.max(0,1-dy*dy/(ry*ry))));R(cx-w,cy+dy,2*w+1,1,c)}}
+function F_ring(cx,cy,r,c){const n=Math.max(8,Math.round(r*7));for(let i=0;i<n;i++){const an=i/n*Math.PI*2;R(cx+Math.cos(an)*r,cy+Math.sin(an)*r,1,1,c)}}
+function F_rspr(rows,pal,cx,cy,k,ang){const h=rows.length,w=rows[0].length,c=Math.cos(ang),s=Math.sin(ang);for(let j=0;j<h;j++)for(let i=0;i<w;i++){const col=pal[rows[j][i]];if(!col)continue;const u=(i-w/2+.5)*k,v=(j-h/2+.5)*k;R(cx+u*c-v*s-k/2,cy+u*s+v*c-k/2,k+.6,k+.6,col)}}
+function F_big(pose,look,x,y,k,flip){const L=typeof look==='string'?LOOKS[look]:look;let f=PS[pose]||PS.stand;if(pose==='walk')f=Math.floor(CT/240)%2?PS.run2:PS.stand;if(pose==='cheer')f=Math.floor(CT/220)%2?PS.cheer1:PS.cheer2;sprF(f,L,Math.round(x),Math.round(y),k||2,flip)}
+function F_heart(cx,cy,r,c){disc(cx-r,cy,r,c);disc(cx+r,cy,r,c);poly([cx-2*r-.5,cy+1,cx+2*r+1.5,cy+1,cx+.5,cy+2.6*r],c)}
+function F_ecg(x,y,w,per,amp,c){R(x,y,w,14,'#0f172a');R(x,y,w,1,'#334155');for(let i=0;i<w;i++){const ph=(i+Math.floor(CT/20))%per;const v=amp?(ph===3?-5:ph===4?4:ph===5?-1:0)*amp:0;R(x+i,y+7+Math.min(0,Math.round(v)),1,Math.abs(Math.round(v))+1,c)}}
+function F_note(x,y,w,h,c){R(x,y,w,h,c||'#fde68a');R(x,y,w,2,'#facc15');R(x+w-3,y+h-3,3,3,'rgba(0,0,0,.15)')}
+Object.assign(LOOKS,{
+ F_jk:{h:'#111827',s:'#d6a77a',t:'#9ca3af',a:'#6b7280',l:'#1e293b',b:'#111'},
+ F_tim:{h:'#a16207',s:'#f1c27d',t:'#e5e7eb',a:'#1e3a8a',l:'#334155',b:'#111'},
+ F_boss:{h:'#9ca3af',s:'#e8b27a',t:'#1e3a8a',a:'#f8fafc',l:'#1e293b',b:'#111'},
+ F_weaver:{h:'#7c2d12',s:'#f1c27d',t:'#be185d',a:'#fbcfe8',l:'#1e293b',b:'#111'},
+ F_king:{h:'#b45309',s:'#f1c27d',t:'#1e40af',a:'#facc15',l:'#78350f',b:'#3f2a20'},
+ F_doug:{h:'#57534e',s:'#f1c27d',t:'#f8fafc',a:'#1f2937',l:'#334155',b:'#111'},
+ F_bill:{h:'#111827',s:'#e8b27a',t:'#0e7490',a:'#a16207',l:'#1e3a8a',b:'#3f2a20'}
+});
+
+/* scenes */
+BG.F_sky=(t,o)=>{grad(o.c1||'#38bdf8',o.c2||'#e0f2fe',0,VH,8);const sy=o.sy||0;for(let k=0;k<6;k++){const x=(k*37+5)%84,y=(((k*31)-sy)%150+150)%150-24;R(x,y,16,3,'#ffffff');R(x+3,y-2,9,2,'#ffffff');R(x+2,y+3,12,1,'#e0f2fe')}};
+BG.F_ice=(t,o)=>{grad('#155e75','#020617',0,VH,8);const th=o.thick?14:8;R(0,0,VW,th,'#e0f2fe');for(let x=0;x<VW;x+=6)R(x,th,6,(x*7)%5+1,'#bae6fd');R(0,0,VW,2,'#f8fafc');
+ for(let k=0;k<3;k++){const x=k*30+10+Math.sin(t/1100+k)*3;poly([x,th,x+5,th,x+14,VH,x+8,VH],'rgba(186,230,253,.05)')}
+ for(let k=0;k<16;k++){const p=((t/7000)+k/16)%1;R((k*29+Math.round(Math.sin(t/1000+k)*3)+96)%96,th+4+p*(VH-th),1,1,'rgba(226,232,240,.55)')}};
+BG.F_savanna=(t,o)=>{if(o.night){grad('#020617','#1e1b4b',0,70);stars(t,66)}else{grad('#7dd3fc','#fef3c7',0,70);disc(80,14,6,'#fde047')}
+ const tc=o.night?'#0f172a':'#3f6212';R(14,44,2,26,o.night?'#0f172a':'#57534e');F_ell(15,43,13,3,tc);F_ell(15,40,8,2,tc);
+ R(0,70,VW,34,o.night?'#3b2a1a':'#d6a35c');for(let k=0;k<26;k++)R((k*37)%96,72+(k*13)%30,2,1,o.night?'#2a1d12':'#b9864a');for(let k=0;k<6;k++){const x=(k*41+9)%96;R(x,68,1,3,o.night?'#1c2b14':'#65a30d');R(x+2,69,1,2,o.night?'#1c2b14':'#65a30d')}};
+BG.F_sand=(t,o)=>{R(0,0,VW,VH,o.night?'#3b2a1a':'#d6a35c');for(let k=0;k<60;k++)R((k*37)%96,(k*53)%104,2,1,o.night?'#2a1d12':'#b9864a');for(let k=0;k<8;k++){const x=(k*43+11)%96,y=(k*29+7)%104;R(x,y,1,3,o.night?'#1c2b14':'#65a30d');R(x+2,y+1,1,2,o.night?'#1c2b14':'#65a30d')}};
+BG.F_forest=(t,o)=>{const s=o.snow,sp=o.spring;grad(s?'#94a3b8':sp?'#7dd3fc':'#fdba74',s?'#e2e8f0':sp?'#e0f2fe':'#fef3c7',0,72);
+ [[6,5],[30,4],[62,6],[86,4]].forEach(([x,w])=>{R(x,0,w,72,'#57534e');R(x+1,0,1,72,'#78716c')});
+ if(!s)for(let k=0;k<12;k++)disc((k*29)%100,(k*7)%14,7,sp?(k%2?'#16a34a':'#15803d'):(k%3?'#ea580c':'#b45309'));else for(let k=0;k<6;k++)R([6,30,62,86][k%4],20+k*9,6,2,'#f8fafc');
+ R(0,72,VW,32,s?'#f1f5f9':sp?'#4d7c0f':'#78350f');for(let k=0;k<30;k++)R((k*37)%96,74+(k*13)%28,2,1,s?'#cbd5e1':sp?'#65a30d':(k%2?'#c2410c':'#a16207'))};
+BG.F_zoo=(t,o)=>{grad('#7dd3fc','#e0f2fe',0,60);clouds(t,6);for(let k=0;k<5;k++)disc(k*22+8,58,9,'#15803d');R(0,58,VW,46,'#65a30d');for(let k=0;k<20;k++)R((k*37)%96,62+(k*13)%20,1,2,'#4d7c0f');R(0,86,VW,18,'#d6b98c');R(0,86,VW,1,'#a8a29e')};
+function F_fence(){for(let x=2;x<VW;x+=14)R(x,62,2,24,'#78350f');R(0,66,VW,2,'#92400e');R(0,76,VW,2,'#92400e')}
+BG.F_office=(t,o)=>{R(0,0,VW,70,'#cbd5e1');for(let y=8;y<70;y+=10)R(0,y,VW,1,'#bfc9d6');R(60,8,28,22,'#7dd3fc');R(60,8,28,1,'#64748b');R(60,29,28,1,'#64748b');R(73,8,1,22,'#64748b');R(0,70,VW,34,'#78716c');for(let y=74;y<VH;y+=6)R(0,y,VW,1,'#6b6460')};
+function F_milky(t,x0,y0,x1,y1){poly([x0,y0-8,x1,y1-8,x1,y1+8,x0,y0+8],'rgba(165,180,252,.10)');poly([x0,y0-4,x1,y1-4,x1,y1+4,x0,y0+4],'rgba(199,210,254,.10)');
+ for(let i=0;i<170;i++){const s=i/170,off=(((i*37)%17)-8)*((i%3)?.6:1);const x=lerp(x0,x1,s)+off*.3,y=lerp(y0,y1,s)+off;const tw=(Math.floor(t/400)+i)%9===0;R(x,y,1,1,tw?'#ffffff':(i%4?'#c7d2fe':'#fef3c7'))}}
+
+/* ---------------- ANIMALS ---------------- */
+const F_FAL1=["....w...........","....ww..........","....www.........","....wwwww.......","ttbbbbbbbbbbhhe.","..cccccccbbbhsy.","................","................","................"];
+const F_FAL2=["................","................","................","................","ttbbbbbbbbbbhhe.","..ccccwwwwwbhsy.","....wwww........","....www.........","....w..........."];
+const F_FALP={x:'#94a3b8',t:'#334155',b:'#475569',w:'#1e293b',c:'#e2e8f0',h:'#0f172a',e:'#fde047',s:'#f8fafc',y:'#facc15'};
+const F_FALPS={...F_FALP,w:'#64748b'};
+const F_FALS=["..t..t..","..tttt..","..bbbb..",".wbbbbw.",".wbbbbw.",".wbccbw.",".wbccbw.","..bccb..","..bccb..","..bhhb..","..hhsh..","...hh...","...yy...","....y..."];
+const F_FALSIT=["..hhh..",".hhhhe.",".hshhhy",".wsswb.","wwcxcww","wwxcxww","wwcxcw.",".wxcw..","..tt...","..tt...",".y.y..."];
+function F_falcon(x,y,k,flip,ph){sprF(Math.floor((CT+(ph||0))/150)%2?F_FAL1:F_FAL2,F_FALP,Math.round(x),Math.round(y),k||1,flip)}
+const F_PIG1=["..ww.....","...ww....","gggggghhy",".gggggg..","........."],F_PIG2=[".........",".........","gggggghhy",".ggwwgg..","...ww...."];
+function F_pigeon(x,y,flip){sprF(Math.floor((CT+x*5)/130)%2?F_PIG1:F_PIG2,{g:'#94a3b8',w:'#64748b',h:'#475569',y:'#fbbf24'},Math.round(x),Math.round(y),1,flip)}
+function F_roofs(){[[0,14,22],[14,12,28],[26,16,18],[42,10,30],[52,18,20],[70,12,26],[82,14,16]].forEach(([x,w,h],i)=>{R(x,VH-h,w,h,i%2?'#64748b':'#475569');R(x+2,VH-h-3,2,3,'#334155');for(let yy=VH-h+4;yy<VH-2;yy+=6)for(let xx=x+2;xx<x+w-2;xx+=4)R(xx,yy,2,2,'#cbd5e1')})}
+function F_train(x,y,len){R(x,y+2,len,8,'#f1f5f9');R(x,y+9,len,1,'#64748b');R(x,y+4,len,2,'#1e3a8a');for(let i=2;i<len-4;i+=5)R(x+i,y+4,3,2,'#93c5fd');poly([x+len,y+2,x+len+12,y+9,x+len+12,y+10,x+len,y+10],'#facc15');R(x+len,y+3,5,2,'#1e293b');R(x,y+10,len+10,1,'#334155')}
+
+K.push({id:'peregrine-dive',batch:'F',title:'THE FASTEST ANIMAL ON EARTH',topic:'Animals',tags:'peregrine falcon bird fastest animal dive stoop speed record city',
+ stamp:{b:3,at:2600,text:'300+ KM/H',bg:'#1d4ed8',top:'50%'},
+ beats:[
+  {d:3600,t:'The fastest animal on Earth is a *bird*. The *peregrine* *falcon*.'},
+  {d:3800,t:'It circles *high* in the sky, watching for a *pigeon* far below.'},
+  {d:3800,t:'Then it tucks in its wings and *dives*. This is called a *stoop*.'},
+  {d:4200,t:'In a dive it can top *300* *km/h*. As fast as a *high-speed* *train*.'},
+  {d:4000,t:'Today many live in *cities*. Tall *buildings* work just like *cliffs*.'}],
+ quiz:{q:'How fast can a diving peregrine falcon fly?',c:'Over 300 km/h',w:'About 100 km/h',ex:'In a dive, called a stoop, a peregrine can pass 300 km/h. No animal on Earth is faster.'},
+ draw(b,lt,t){
+  if(b===0){bg('F_sky');const x=M(-50,24,lt,0,2200),y=36+Math.round(Math.sin(t/300)*2);F_falcon(x,y,3);ctext('PEREGRINE FALCON',20,'#1e3a8a');
+   if(lt>1800){board(16,82,64,12,'FASTEST ANIMAL','#fde68a');hit('f','ping')}if(a.every(600,'fl')>=0)a.sfx('swing')}
+  if(b===1){bg('F_sky');F_roofs();const an=t/600,fx=48+Math.cos(an)*30,fy=14+Math.sin(an)*5;F_falcon(fx-8,fy,1,Math.sin(an)>0);
+   const px=Math.round(((lt*0.012)%120)-12),py=64;F_pigeon(px,py,false);text('HIGH',4,30,'#1e3a8a');R(10,37,1,22,'#1e3a8a');R(9,38,3,1,'#1e3a8a');
+   if(lt>1400){if(BL(250))for(let i=1;i<14;i++){const s=i/14;R(lerp(fx,px+4,s),lerp(fy+6,py+2,s),1,1,'#dc2626')}
+    const c='#dc2626';R(px-3,py-2,3,1,c);R(px-3,py-2,1,3,c);R(px+10,py-2,3,1,c);R(px+12,py-2,1,3,c);R(px-3,py+6,3,1,c);R(px-3,py+4,1,3,c);R(px+10,py+6,3,1,c);R(px+12,py+4,1,3,c);hit('lock','beep')}}
+  if(b===2){const sp=lt<1100?0:(lt-1100)*(lt-1100)/5000;bg('F_sky',{sy:sp});
+   if(lt<1100){F_falcon(40,24,2,false)}else{for(let k=0;k<9;k++){const x=(k*13+7)%90+3,y=110-((k*29+(lt-1100)*0.25)%124);R(x,y,1,10,'rgba(255,255,255,.85)')}
+    F_rspr(F_FALS,F_FALP,48,lerp(34,46,P(lt,1100,2400)),2,lerp(-1.3,-0.15,P(lt,1100,1500)));hit('fall','fall');if(lt>1700)ctext('STOOP',86,'#1e3a8a',2)}}
+  if(b===3){bg('F_sky',{sy:lt*0.35});for(let k=0;k<7;k++){const x=(k*13+40)%56+36,y=60-((k*31+lt*0.3)%70);R(x,y,1,9,'rgba(255,255,255,.85)')}
+   F_rspr(F_FALS,F_FALP,74,24,2,-0.5);const v=Math.round(300*ease(P(lt,200,2400)));text(String(v),4,6,'#1e3a8a',3);text('KM/H',4,24,'#1e3a8a',2);if(lt<2400&&a.every(90,'tk')>=0)a.sfx('tick');
+   R(0,50,VW,54,'#bae6fd');for(let k=0;k<4;k++){const x=((k*40-lt*0.05)%160+160)%160-30;F_ell(x,84,22,10,'#86efac')}R(0,86,VW,18,'#4d7c0f');R(0,92,VW,2,'#57534e');
+   for(let i=0;i<14;i++){const x=((i*8-lt*0.6)%112+112)%112-8;R(x,94,4,2,'#78350f')}for(let i=0;i<3;i++){const x=((i*48-lt*0.6)%144+144)%144-24;R(x,62,2,30,'#475569')}R(0,64,VW,1,'#475569');
+   F_train(4,79,60);R(0,50,VW,2,'#0f172a');if(a.every(320,'cl')>=0)a.sfx('heavy')}
+  if(b===4){bg('F_sky');F_pigeon(((lt*0.02)%130)-14,10,false);
+   poly([0,104,0,30,8,26,20,30,26,48,30,64,38,104],'#78716c');poly([0,104,0,60,12,58,22,70,30,104],'#57534e');R(8,50,22,3,'#57534e');R(0,96,40,8,'#1d4ed8');for(let k=0;k<3;k++)R(((k*13+lt*0.01)%36),99,5,1,'#60a5fa');
+   sprF(F_FALSIT,F_FALPS,12,28+(BL(700)?0:1),2);
+   R(56,28,32,76,'#a8a29e');poly([56,28,72,4,88,28],'#78716c');for(let yy=34;yy<100;yy+=10){R(61,yy,4,6,'#1e293b');R(79,yy,4,6,'#1e293b')}R(52,56,40,3,'#78716c');
+   if(lt<2600)sprF(F_FALSIT,F_FALPS,64,34+(BL(600)?0:1),2);else{F_falcon(M(60,-30,lt,2600,4000),M(36,4,lt,2600,4000),2,true);hit('go','swing')}
+   board(2,84,32,10,'CLIFF','#fde68a');board(58,86,32,10,'CITY','#fde68a');ctext('=',62,'#1e3a8a',2)}}
+});
+
+const F_TERN1=["....gg..........",".....gg.........","......ggg.......","t.......ggg..kk.",".tbbbbbbbbbbbkkr","t..bbbbbbbbbb...","................","................"];
+const F_TERN2=["................","................","................","t............kk.",".tbbbbbbbbbbbkkr","t..bbbbgggbbb...",".......ggg......","......gg........"];
+const F_TERNSIT=["...kkk..","..kkkkrr","..bbbbb.",".bbbbbg.","bbbbbgg.","tt.bbb..","t...r..."];
+const F_TERNP={g:'#94a3b8',t:'#e2e8f0',b:'#f8fafc',k:'#111827',r:'#dc2626'};
+function F_tern(x,y,k,flip,ph){sprF(Math.floor((CT+(ph||0))/160)%2?F_TERN1:F_TERN2,F_TERNP,Math.round(x),Math.round(y),k||1,flip)}
+function F_phone(x,y,w,h){R(x,y,w,h,'#111827');R(x+1,y+2,w-2,h-4,'#38bdf8');R(x+1,y+2,w-2,2,'#7dd3fc');R(x+Math.floor(w/2)-1,y+h-2,2,1,'#475569')}
+
+K.push({id:'arctic-tern',batch:'F',title:'THE ARCTIC TERN',topic:'Animals',tags:'arctic tern bird migration longest flight pole antarctica summer',
+ beats:[
+  {d:3600,t:'The *Arctic* *tern* weighs about *100* *grams*. Less than a *phone*.'},
+  {d:4000,t:'Every year it flies from the *Arctic* to the *Antarctic*, and back.'},
+  {d:4000,t:'Tiny trackers showed one year of flying can top *70,000* *km*.'},
+  {d:4000,t:'It follows *summer* both ways. So it gets *two* *summers* a year.'},
+  {d:4600,t:'Over a lifetime, that adds up to about *three* trips to the *Moon* and back.'}],
+ quiz:{q:'Where does the Arctic tern go for our winter?',c:'Near Antarctica, for its summer',w:'Asleep in Arctic burrows',ex:'It flies from the Arctic to the Antarctic and back each year, so it lives in two summers.'},
+ draw(b,lt,t){
+  if(b===0){bg('F_sky');const land=lt>1200;const tl=land?0.22-0.1*Math.exp(-(lt-1200)/450)*Math.cos((lt-1200)/90):0.32;
+   const lx=48-30*Math.cos(tl),ly=40-30*Math.sin(tl),rx=48+30*Math.cos(tl),ry=40+30*Math.sin(tl);
+   R(47,40,2,46,'#57534e');R(34,86,30,3,'#57534e');line(lx,ly,rx,ry,'#78350f',2);disc(48,40,2,'#a16207');
+   [[lx,ly],[rx,ry]].forEach(([x,y])=>{line(x,y,x-8,y+14,'#94a3b8');line(x,y,x+8,y+14,'#94a3b8');R(x-10,y+14,21,2,'#78350f')});
+   F_phone(Math.round(rx-5),Math.round(ry-4),11,18);
+   if(land){sprF(F_TERNSIT,F_TERNP,Math.round(lx-8),Math.round(ly),2);hit('ld','thud')}else F_tern(M(-24,lx-8,lt,0,1200),M(10,ly,lt,0,1200),2,false);
+   text('100 G',Math.round(lx-9),Math.round(ly)+19,'#0f172a');text('PHONE',Math.round(rx-9),Math.round(ry)+19,'#0f172a');ctext('ARCTIC TERN',4,'#1e3a8a')}
+  if(b===1){R(0,0,VW,VH,'#1e40af');for(let y=16;y<90;y+=6)for(let k=0;k<4;k++)R(((k*29+y*7)+t*0.01)%110-8,y,5,1,'#2563eb');
+   poly([0,14,18,14,22,30,14,44,20,56,16,70,10,84,0,84],'#4d7c0f');poly([96,14,78,16,74,30,82,38,76,50,84,66,90,80,96,82],'#4d7c0f');
+   R(0,0,VW,12,'#f8fafc');for(let x=0;x<VW;x+=5)R(x,12,5,(x*3)%4+1,'#f8fafc');poly([22,10,36,10,32,22,26,24],'#e2e8f0');R(0,92,VW,12,'#f8fafc');for(let x=0;x<VW;x+=5)R(x,91-(x*3)%3,5,2,'#f8fafc');
+   text('ARCTIC',4,3,'#1e3a8a');text('ANTARCTICA',4,96,'#1e3a8a');
+   const down=lt<2000,s=down?P(lt,0,2000):1-P(lt,2000,4000);const px=s2=>(down?40:56)+Math.sin(s2*6)*6,py=s2=>lerp(18,86,s2);
+   for(let i=0;i<=40;i++){const q=i/40;if(q<=P(lt,0,2000))R(40+Math.sin(q*6)*6,lerp(18,86,q),1,1,'#fde68a');if(!down&&q>=s)R(56+Math.sin(q*6)*6,lerp(18,86,q),1,1,'#fde68a')}
+   F_tern(px(s)-8,py(s)-4,1,!down);if(a.every(500,'w')>=0)a.sfx('tick');if(lt>1950&&lt<2100)hit('turn','ping')}
+  if(b===2){grad('#7dd3fc','#e0f2fe',0,54);R(0,54,VW,50,'#1d4ed8');for(let y=58;y<VH;y+=5)for(let k=0;k<5;k++)R((((k*23+y*3)-lt*0.06)%110+110)%110-8,y,6,1,'#3b82f6');
+   const x=26,y=30+Math.round(Math.sin(t/300)*2);F_tern(x,y,2,false);R(x+14,y+12,3,2,'#f97316');R(x+15,y+14,1,2,'#f97316');
+   const n=Math.round(70000*ease(P(lt,200,3200))/100)*100;R(6,82,84,16,'#0f172a');ctext(String(n)+' KM',85,'#fde68a',2);if(lt<3200&&a.every(100,'tk')>=0)a.sfx('tick');if(lt>3200)hit('dn','ping');
+   if(lt>1400){text('TRACKER',50,64,'#fde68a');line(54,63,x+16,y+15,'#fde68a')}}
+  if(b===3){const q=(lt%4000)/4000,s=0.5-0.5*Math.cos(q*Math.PI*2);
+   R(0,0,VW,50,mix('#7dd3fc','#1e293b',s));R(0,52,VW,52,mix('#1e293b','#7dd3fc',s));R(0,40,VW,10,mix('#f8fafc','#94a3b8',s));R(0,94,VW,10,mix('#94a3b8','#f8fafc',s));R(0,50,VW,2,'#0f172a');
+   if(s<.5){disc(82,24,6,'#fde047');text('SUMMER',60,34,'#b45309')}else{disc(82,74,6,'#fde047');text('SUMMER',60,84,'#b45309')}
+   text('NORTH',4,42,'#0f172a');text('SOUTH',4,96,'#0f172a');F_tern(14+Math.sin(t/700)*8,lerp(20,72,s),2,false);if(a.every(2000,'sw')>=0)a.sfx('swing')}
+  if(b===4){bg('space');planet(14,52,9,'#1d4ed8','#15803d');disc(84,52,5,'#d1d5db');R(82,50,2,2,'#9ca3af');ctext('LIFETIME',6,'#e5e7eb');
+   const cols=['#fde68a','#fdba74','#f9a8d4'];let done=0;
+   for(let i=0;i<3;i++){const s0=300+i*1200,p=P(lt,s0,s0+1100),h=8+i*8;if(p<=0)continue;const pts=[];for(let j=0;j<=40;j++){const q=j/40;if(q>p)break;
+     const out=q<.5,u=out?q*2:(q-.5)*2;const x=out?lerp(23,79,u):lerp(79,23,u),y=52+(out?-1:1)*Math.sin(u*Math.PI)*h;R(x,y,1,1,cols[i]);pts.push([x,y])}
+    if(p<1&&pts.length){const [x,y]=pts[pts.length-1];disc(x,y,1,'#ffffff')}if(p>=1)done=i+1;if(p>=1)hit('trip'+i,'ping')}
+   if(done>0)ctext('X'+done,78,'#fde68a',3)}}
+});
+
+function F_shark(x,y,s,flip,ph){s=s||1;const W=48,Q=v=>v.map((n,i)=>i%2?y+n*s:(flip?x+(W-n)*s:x+n*s));const sw=Math.sin((CT+(ph||0))/600)*2;
+ poly(Q([8,5,1,-1+sw,3,6+sw*.5,0,13+sw,8,9]),'#44403c');
+ poly(Q([7,5,14,3,26,1.5,38,2,45,4,48,7,46,10,38,12,24,12.5,12,11,7,9]),'#57534e');
+ poly(Q([12,10,24,10.5,38,10,46,9,46,10,38,12,24,12.5,12,11]),'#78716c');
+ poly(Q([20,2.5,23,-1,26,2]),'#44403c');poly(Q([12,4,14,1.5,16,3.5]),'#44403c');poly(Q([33,10,38,11,31,15]),'#44403c');
+ [[30,5],[22,7],[16,6],[34,8]].forEach(([u,v])=>{const p=Q([u,v]);R(p[0],p[1],Math.max(1,s),Math.max(1,s),'#44403c')});
+ for(let i=0;i<3;i++){const p=Q([36+i*1.5,6]);R(p[0],p[1],1,Math.max(2,3*s),'#3f3a36')}
+ const e=Q([42,5.5]);R(e[0],e[1],Math.max(1,Math.round(s)),Math.max(1,Math.round(s)),'#a5f3fc')}
+function F_usflag(x,y){R(x-1,y,1,16,'#cbd5e1');R(x,y,15,9,'#f8fafc');for(let j=0;j<9;j+=2)R(x,y+j,15,1,'#dc2626');R(x,y,6,5,'#1e3a8a');R(x+1,y+1,1,1,'#fff');R(x+3,y+1,1,1,'#fff');R(x+2,y+3,1,1,'#fff');R(x+4,y+3,1,1,'#fff')}
+
+K.push({id:'greenland-shark',batch:'F',title:'THE 400-YEAR-OLD SHARK',topic:'Animals',tags:'greenland shark oldest animal vertebrate age arctic ocean eyes lens',
+ stamp:{b:3,at:2800,text:'AT LEAST 272',bg:'#b45309'},
+ beats:[
+  {d:3600,t:'A shark swimming today could be *older* than the *United* *States*.'},
+  {d:3800,t:'The *Greenland* *shark* lives in icy *Arctic* water and moves *very* *slowly*.'},
+  {d:4200,t:'In *2016*, scientists worked out their ages from the *lenses* of their *eyes*.'},
+  {d:4200,t:'Best estimate for the oldest: about *390* *years*. At least *272*.'},
+  {d:4200,t:'They grow under *1* *cm* a year, and are not adults until about *150*.'}],
+ quiz:{q:'How did scientists work out the sharks\' ages?',c:'Tested the lenses of their eyes',w:'Counted rings in their teeth',ex:'The centre of the eye lens forms before birth and never changes, so dating it shows when the shark was born.'},
+ draw(b,lt,t){
+  if(b===0){bg('F_ice');F_usflag(30,14);text('USA 1776',48,18,'#e0f2fe');F_shark(lerp(96,4,lt/3600),50,1.3,true);if(lt>1600&&BL(350))ctext('OLDER?',86,'#fde68a',2);if(a.every(1200,'sw')>=0)a.sfx('hum')}
+  if(b===1){bg('F_ice',{thick:true});ctext('ICY ARCTIC WATER',22,'#e0f2fe');F_shark(lerp(2,14,lt/3800),46,1.5,false,0);
+   const fx=((lt*0.09)%150)-20;sprF(["..yy.","yyyyk","y.yy."],{y:'#fbbf24',k:'#111'},Math.round(fx),82,1);if(BL(400))ctext('VERY SLOW',90,'#fde68a');if(a.every(1400,'sl')>=0)a.sfx('hum')}
+  if(b===2){R(0,0,VW,VH,'#020617');disc(22,44,18,'#57534e');disc(22,44,10,'#111');disc(22,44,5,'#e2e8f0');R(20,41,2,2,'#ffffff');text('EYE',16,70,'#e5e7eb');
+   line(27,40,54,26,'#475569');line(27,48,54,64,'#475569');disc(72,45,20,'#1e293b');const n=Math.floor(P(lt,200,2600)*6);const LC=['#e2e8f0','#cbd5e1','#bae6fd','#a5f3fc','#fde68a','#fbbf24'];
+   for(let i=0;i<n;i++)disc(72,45,18-i*3,LC[i]);if(n>0&&n<6&&a.every(400,'ly')>=0)a.sfx('pop');const sx=Math.round(52+((lt/8)%40));R(sx,25,1,40,'rgba(74,222,128,.7)');text('LENS',64,70,'#fde68a');board(30,84,36,12,'2016','#fde68a')}
+  if(b===3){R(0,0,VW,VH,'#0b1021');const n=Math.round(390*ease(P(lt,200,2400)));ctext(String(n),10,'#fde68a',4);ctext('YEARS',34,'#e5e7eb');if(lt<2400&&a.every(70,'tk')>=0)a.sfx('tick');
+   R(8,64,80,8,'#1e293b');const w=Math.round(80*272/512*P(lt,2400,3000));R(8,64,w,8,'#f59e0b');if(lt>3000){for(let x=8+w;x<8+Math.round(80*512/512);x+=2)if(BL(300))R(x,64,1,8,'#78350f');R(8+Math.round(80*390/512),62,1,12,'#fde68a')}
+   text('272',8,76,'#f59e0b');if(lt>3000){text('390',8+Math.round(80*390/512)-5,76,'#fde68a')}hit('bar','ping')}
+  if(b===4){bg('F_ice');const age=Math.round(150*P(lt,200,3400)),s=lerp(.5,1.6,age/150);F_shark(8,80-13*s,s,false);R(4,86,88,5,'#fde68a');for(let x=4;x<92;x+=8)R(x,86,1,3,'#78350f');
+   text('AGE '+age,4,14,'#e0f2fe');if(age>=150){text('ADULT',60,14,'#4ade80');hit('ad','right')}text('UNDER 1 CM A YEAR',4,96,'#bae6fd');if(age<150&&a.every(200,'tk')>=0)a.sfx('tick')}}
+});
+
+const F_BTL1=["........l.","....sbbbl.","..bbbbbbbl",".hbbbbbbb.","hh.bbbbb..","h.l..l.l..",".l..l..l.."];
+const F_BTL2=[".......l..","....sbbbl.","..bbbbbbbl",".hbbbbbbb.","hh.bbbbb..","h..l..l.l.","..l..l..l."];
+const F_BTLP={b:'#1c1917',s:'#78716c',h:'#0c0a09',l:'#44403c',c:'#f97316'};
+const F_BTT=["l.hhh.l",".lhhhl.","..bbb..","lbbsbbl",".bbsbb.","lbbsbbl",".bbbbb.","l.bbb.l"];
+function F_dung(cx,cy,r,rot){disc(cx,cy,r,'#78350f');for(let i=0;i<5;i++){const an=rot+i*1.26;R(cx+Math.cos(an)*r*.6,cy+Math.sin(an)*r*.6,1,1,'#a16207')}R(cx-Math.round(r/2),cy-Math.round(r/2),1,1,'#b45309')}
+function F_roller(bx,gy,r){F_dung(bx,gy-r,r,bx/r);sprF(Math.floor(CT/120)%2?F_BTL1:F_BTL2,F_BTLP,Math.round(bx-r-18),gy-14,2)}
+function F_rollT(x,y,dir,cap,ball){if(ball!==false)F_dung(x,y,4,x/4+y/4);const bx=x-Math.cos(dir)*(ball===false?0:9),by=y-Math.sin(dir)*(ball===false?0:9);
+ F_rspr(F_BTT,cap?{...F_BTLP,h:'#f97316'}:F_BTLP,bx,by,1,dir+(ball===false?0:Math.PI)+Math.PI/2)}
+function F_wander(seed,tt){return [48+Math.sin(tt*0.0011+seed)*26+Math.sin(tt*0.0027+seed*2)*10,62+Math.cos(tt*0.0013+seed*3)*16+Math.sin(tt*0.0031+seed)*6]}
+
+K.push({id:'dung-beetle-stars',batch:'F',title:'BEETLES THAT STEER BY STARS',topic:'Animals',tags:'dung beetle milky way stars night navigation insects africa planetarium',
+ stamp:{b:4,at:2200,text:'MILKY WAY',bg:'#4338ca',top:'26%'},
+ beats:[
+  {d:3600,t:'A *dung* *beetle* rolls a ball of *poo* away in a *straight* *line*.'},
+  {d:4000,t:'Straight is fastest. It gets away from *rivals* that try to *steal* the ball.'},
+  {d:3600,t:'Some roll at *night*. So how do they keep straight in the dark?'},
+  {d:4200,t:'In *2013*, scientists gave some tiny *caps* to block the sky. They *wandered*.'},
+  {d:4400,t:'In a *planetarium*, the *Milky* *Way* alone kept them on course.'}],
+ quiz:{q:'What do some dung beetles steer by at night?',c:'The Milky Way',w:'The smell of dung',ex:'Tests in South Africa showed these beetles use the band of the Milky Way to roll straight. It was the first animal known to do this.'},
+ draw(b,lt,t){
+  if(b===0){bg('F_savanna');F_ell(8,70,10,5,'#78350f');const bx=Math.round(lerp(26,80,lt/3600));for(let x=4;x<bx-22;x+=4)R(x,78,2,1,'#7c2d12');F_roller(bx,74,6);ctext('DUNG BEETLE',4,'#7c2d12');if(lt>2000)ctext('STRAIGHT LINE',90,'#7c2d12');if(a.every(260,'st')>=0)a.sfx('step')}
+  if(b===1){bg('F_sand');F_ell(12,52,10,8,'#78350f');F_ell(11,50,6,4,'#92400e');const x=lerp(28,86,lt/4000);for(let xx=20;xx<x-12;xx+=4)R(xx,52,2,1,'#7c2d12');F_rollT(x,52,0,false);
+   const rx=lerp(12,Math.min(58,x-26),P(lt,300,2600)),back=lt>2800;F_rollT(back?lerp(rx,8,P(lt,2800,3900)):rx,60,back?Math.PI:0,false,false);
+   if(!back&&BL(300))text('THIEF',Math.round(rx)-8,68,'#dc2626');if(back)text('TOO SLOW',Math.round(lerp(rx,8,P(lt,2800,3900)))-2,68,'#7c2d12');if(a.every(240,'st')>=0)a.sfx('step')}
+  if(b===2){bg('F_savanna',{night:true});F_dung(48,70,9,0);sprF(F_BTL1,{...F_BTLP,b:'#57534e',s:'#d6d3d1',h:'#44403c',l:'#78716c'},40,46,2,Math.floor(lt/500)%2===1);if(BL(400))text('?',46,24,'#fde68a',3);if(a.every(500,'tn')>=0)a.sfx('tick')}
+  if(b===3){bg('F_sand',{night:true});[0,2.5].forEach((sd,j)=>{const tt=t*1.2;for(let i=30;i>0;i--){const p=F_wander(sd,tt-i*90);if(i%2)R(p[0],p[1],1,1,'rgba(253,230,138,.6)')}
+    const p=F_wander(sd,tt),q=F_wander(sd,tt+40);F_rollT(p[0],p[1],Math.atan2(q[1]-p[1],q[0]-p[0]),true)});
+   R(2,74,32,28,'#0f172a');R(2,74,32,1,'#475569');F_rspr(F_BTT,{...F_BTLP,b:'#57534e',s:'#d6d3d1',h:'#f97316'},18,86,2,0);text('CAP',24,96,'#f97316');board(4,4,28,11,'2013','#fde68a');if(BL(400))text('LOST',74,92,'#fde68a');if(a.every(380,'wd')>=0)a.sfx('step')}
+  if(b===4){R(0,0,VW,VH,'#020617');stars(t,60);F_milky(t,0,44,96,10);for(let i=0;i<=40;i++){const an=Math.PI+i/40*Math.PI;R(48+Math.cos(an)*47,62+Math.sin(an)*58,1,1,'rgba(148,163,184,.4)')}
+   F_ell(48,80,44,14,'#27272a');F_ell(48,80,42,12,'#3f3f46');const x=lerp(12,84,lt/4400);for(let xx=8;xx<x-12;xx+=4)R(xx,80,2,1,'#fde68a');F_rollT(x,80,0,false);
+   ctext('PLANETARIUM',97,'#a5b4fc');if(a.every(300,'st')>=0)a.sfx('step')}}
+});
+
+const F_FROG=["...........bb...","..........bkkb..",".......bbbbmmbbb","....bbbbbbbbbbbw","..bbbbbbbbbbbww.",".bdddddbbbbbw...","bddlddlbbl......","bdddddd..l......","lll.lll..ll....."];
+function F_frog(x,y,k,frz){const f=clamp(frz||0);sprF(F_FROG,{b:mix('#a16207','#93c5fd',f),k:'#111111',m:mix('#422006','#475569',f),w:mix('#fde68a','#e0f2fe',f),l:mix('#854d0e','#60a5fa',f),d:mix('#854d0e','#7dd3fc',f)},Math.round(x),Math.round(y),k||1)}
+function F_block(x,y,w,h){R(x,y,w,h,'rgba(186,230,253,.45)');R(x,y,w,1,'#e0f2fe');R(x,y,1,h,'#e0f2fe');R(x+w-1,y,1,h,'#7dd3fc');R(x,y+h-1,w,1,'#7dd3fc');for(let i=0;i<3;i++)line(x+4+i*6,y+4,x+10+i*6,y+h/2-6+i*2,'rgba(255,255,255,.55)')}
+function F_snow(t){for(let k=0;k<18;k++){const p=((t/3500)+k/18)%1;R((k*37+Math.round(Math.sin(t/600+k)*3)+96)%96,p*VH,1,1,'#ffffff')}}
+
+K.push({id:'wood-frog',batch:'F',title:'THE FROG THAT FREEZES',topic:'Animals',tags:'wood frog freeze ice winter alaska heart stops sugar thaw animals',
+ stamp:{b:4,at:1800,text:'ALIVE',bg:'#15803d',top:'22%'},
+ beats:[
+  {d:3600,t:'This frog spends winter *frozen*. No heartbeat. No breathing.'},
+  {d:4000,t:'*Wood* *frogs* live as far north as *Alaska*. In autumn they hide under *leaves*.'},
+  {d:4000,t:'As ice creeps in, its liver floods its body with *sugar*.'},
+  {d:4200,t:'Up to about *two* *thirds* of its body water turns to *ice*. Its heart *stops*.'},
+  {d:4200,t:'In spring it *thaws*, its heart starts again, and it hops away.'}],
+ quiz:{q:'What protects a freezing wood frog\'s cells?',c:'Sugar made by its liver',w:'A thick layer of fat',ex:'The liver pumps out sugar, which acts like antifreeze inside the cells while the rest of the body freezes.'},
+ draw(b,lt,t){
+  if(b===0){bg('F_forest',{snow:true});F_snow(t);F_block(18,36,60,36);F_frog(24,44,3,1);F_ecg(4,82,88,40,0,'#64748b');if(BL(500))text('HEART 0',6,84,'#f87171');if(a.every(1000,'bp')>=0)a.sfx('beep')}
+  if(b===1){bg('F_forest');for(let k=0;k<8;k++){const p=((t/2600)+k/8)%1;R((k*23+Math.round(Math.sin(t/300+k)*4)+96)%96,p*80,2,1,k%2?'#ea580c':'#ca8a04')}
+   const p=P(lt,0,2200),hx=lerp(-30,34,p),hop=Math.abs(Math.sin(p*Math.PI*4))*8;F_frog(hx,58-hop,2,0);if(lt<2200&&a.every(550,'hp')>=0)a.sfx('bounce');
+   const n=Math.floor(P(lt,2300,3800)*16);for(let i=0;i<n;i++)R(36+(i*7)%24,64+(i*5)%10,4,2,i%3?'#c2410c':'#a16207');board(30,4,36,11,'ALASKA','#fde68a')}
+  if(b===2){R(0,0,VW,VH,'#0c1a3a');for(let x=0;x<VW;x+=8)R(x,0,1,VH,'#13244a');for(let y=0;y<VH;y+=8)R(0,y,VW,1,'#13244a');
+   sprF(F_FROG,{b:'#1e3a8a',k:'#93c5fd',m:'#1e40af',w:'#3b82f6',l:'#1d4ed8',d:'#1e40af'},16,30,4);disc(48,54,5,'#b45309');text('LIVER',38,66,'#fdba74');
+   for(let i=0;i<22;i++){const p=((lt/1400)+i/22)%1,an=i*2.4;const x=48+Math.cos(an)*p*20,y=52+Math.sin(an)*p*9;R(x,y,2,2,'#ffffff')}ctext('SUGAR',22,'#ffffff');
+   const L=Math.round(P(lt,300,3600)*16);for(let k=0;k<8;k++){const y=6+k*12;line(0,y,L-(k%2)*4,y+3,'#e0f2fe');line(VW-1,y+5,VW-1-L+(k%2)*4,y+8,'#e0f2fe')}if(lt>1500)text('ICE',2,92,'#e0f2fe');if(a.every(300,'sg')>=0)a.sfx('tick')}
+  if(b===3){bg('F_forest',{snow:true});F_snow(t);const f=P(lt,0,3000);F_frog(40,46,3,f);R(4,24,10,52,'#0f172a');const h=Math.round(50*(2/3)*f);R(5,75-h,8,h,'#bae6fd');R(2,75-Math.round(50*2/3),14,1,'#fde68a');R(1,14,15,8,'#0f172a');text('ICE',3,16,'#e0f2fe');R(1,77,15,9,'#0f172a');text('2/3',3,79,'#fde68a');
+   const stop=lt>2800,per=stop?99999:Math.round(lerp(500,1400,f));const beat=!stop&&(lt%per)<120;F_heart(36,18,beat?3:2,stop?'#64748b':'#ef4444');if(beat)hit('hb'+Math.floor(lt/per),'thud');F_ecg(18,86,74,stop?999:30,stop?0:1-f*.6,stop?'#64748b':'#4ade80');if(stop&&BL(400))text('STOPPED',46,16,'#dc2626')}
+  if(b===4){bg('F_forest',{spring:true});const m=P(lt,0,1600),hop=lt>2600;
+   if(!hop){F_block(18,36+Math.round(36*m),60,Math.max(1,Math.round(36*(1-m))));F_frog(24,44,3,1-m);for(let k=0;k<4;k++)R(26+k*12,70+((t/5+k*7)%10),1,2,'#7dd3fc');if(a.every(400,'dr')>=0&&lt<1600)a.sfx('drip')}
+   else{const p=P(lt,2600,4200);F_frog(lerp(24,100,p),44-Math.abs(Math.sin(p*Math.PI*3))*14,3,0);if(a.every(500,'hp')>=0)a.sfx('bounce')}
+   const on=lt>1600;F_ecg(4,86,88,on?30:999,on?1:0,on?'#4ade80':'#64748b');if(on&&a.every(600,'hb')>=0)a.sfx('beep')}}
+});
+
+/* ---------------- TECH ---------------- */
+function F_player(x,y,w,h,prog,tm){R(x,y,w,h,'#0f172a');R(x,y,w,1,'#334155');R(x+2,y+h-9,w-4,2,'#475569');R(x+2,y+h-9,Math.round((w-4)*clamp(prog)),2,'#ef4444');disc(x+2+Math.round((w-4)*clamp(prog)),y+h-8,2,'#ef4444');text(tm,x+3,y+h-6,'#e5e7eb')}
+function F_play(cx,cy,c){for(let i=0;i<9;i++)R(cx-3+i,cy-8+i,1,16-2*i,c)}
+function F_eleph(x,y,ph){const g='#9ca3af',d='#6b7280';F_ell(x+26,y+14,18,11,g);disc(x+9,y+10,8,g);F_ell(x+14,y+10,5,7,d);R(x+5,y+8,1,1,'#111');R(x+12,y+21,6,11,g);R(x+22,y+22,6,10,d);R(x+32,y+22,6,10,g);R(x+38,y+21,5,11,d);
+ line(x+44,y+10,x+47,y+18,d);R(x+5,y+16,3,1,'#f8fafc');for(let i=0;i<10;i++){const px=x+3+Math.sin(ph+i*0.35)*i*0.5,py=y+14+i*2;R(px-1,py,3,2,g)}}
+
+K.push({id:'me-at-the-zoo',batch:'F',title:'THE FIRST YOUTUBE VIDEO',topic:'Tech',tags:'youtube first video me at the zoo elephants internet google 2005',
+ stamp:{b:4,at:2200,text:'SOLD',bg:'#15803d',top:'80%'},
+ beats:[
+  {d:3600,t:'The first video ever uploaded to *YouTube* is just *19* *seconds* long.'},
+  {d:3800,t:'April *2005*. Co-founder *Jawed* *Karim* stands at *San* *Diego* *Zoo*.'},
+  {d:4400,t:'Behind him are *elephants*. He says they have really, really, really long *trunks*.'},
+  {d:3800,t:"That's it. That's the whole video. It's called *Me* *at* *the* *zoo*."},
+  {d:4200,t:'Eighteen months later, *Google* bought YouTube for *1.65* *billion* *dollars*.'}],
+ quiz:{q:'What was the first YouTube video about?',c:'Elephants at a zoo',w:'A cat playing a piano',ex:'Me at the zoo shows co-founder Jawed Karim in front of the elephants at San Diego Zoo. It lasts 19 seconds.'},
+ draw(b,lt,t){
+  if(b===0){R(0,0,VW,VH,'#020617');const pr=P(lt,300,3400),s=Math.min(19,Math.floor(pr*19));F_player(6,8,84,62,pr,'0:'+String(s).padStart(2,'0')+' / 0:19');
+   disc(48,34,13,lt<300||BL(500)?'#334155':'#1e293b');F_play(48,34,'#f8fafc');ctext('19 SECONDS',76,'#fde68a',2);ctext('THE FIRST VIDEO',94,'#e5e7eb');if(lt>300&&a.every(163,'sec')>=0&&s<19)a.sfx('tick')}
+  if(b===1){bg('F_zoo');R(30,26,2,16,'#78350f');R(64,26,2,16,'#78350f');board(22,16,52,11,'SAN DIEGO ZOO','#fde68a');F_fence();
+   const x=M(-20,40,lt,0,2600);F_big(lt<2600?'walk':'stand','F_jk',x,62,2);if(BL(500))disc(6,94,2,'#ef4444');text('REC',10,92,'#7c2d12');board(4,4,28,11,'2005','#fde68a');if(lt<2600&&a.every(300,'st')>=0)a.sfx('step')}
+  if(b===2){bg('F_zoo');F_eleph(46,34,t/400);F_fence();F_big('stand','F_jk',14,62,2);
+   const W=['REALLY','REALLY','REALLY','LONG','TRUNKS'],i=Math.min(4,Math.floor(lt/700));R(4,30,38,12,'#f8fafc');R(16,42,3,3,'#f8fafc');text(W[i],4+Math.round((38-tw(W[i]))/2),34,i>=3?'#b91c1c':'#111827');
+   if(a.every(700,'wd')>=0&&lt<3500)a.sfx('pop');if(lt>3500)hit('tr','horn')}
+  if(b===3){R(0,0,VW,VH,'#020617');const pr=lerp(.8,1,P(lt,0,1200));F_player(6,8,84,62,pr,(pr>=1?'0:19':'0:1'+Math.floor(pr*10-1))+' / 0:19');
+   R(7,9,82,50,'#7dd3fc');R(7,40,82,19,'#65a30d');F_ell(62,36,12,7,'#9ca3af');disc(50,32,5,'#9ca3af');R(54,40,3,7,'#9ca3af');R(66,40,3,7,'#9ca3af');R(47,36,2,8,'#9ca3af');guy(20,40,'stand','F_jk');
+   if(lt>1200){R(7,9,82,50,'rgba(2,6,23,.6)');ctext('THE END',30,'#f8fafc',2);hit('end','ping')}ctext('ME AT THE ZOO',80,'#fde68a');if(lt>1200)ctext('19 SECONDS',90,'#94a3b8')}
+  if(b===4){R(0,0,VW,VH,'#052e16');for(let k=0;k<14;k++){const p=((t/1800)+k/14)%1,x=(k*29+11)%92;disc(x,p*VH,3,'#facc15');R(x-1,p*VH-1,1,1,'#fef9c3')}
+   const hp=Math.round(P(lt,0,3000)*14);for(let i=0;i<hp;i++)R(4+((i*13)%80),100-Math.floor(i/6)*4,10,3,'#ca8a04');
+   R(10,10,76,46,'rgba(2,44,22,.85)');ctext('1.65',14,'#fde68a',4);ctext('BILLION DOLLARS',40,'#f8fafc');board(34,62,28,11,'2006','#fde68a');if(a.every(220,'cn')>=0)a.sfx('pop')}}
+});
+
+K.push({id:'vague-but-exciting',batch:'F',title:'VAGUE BUT EXCITING',topic:'Tech',tags:'world wide web internet cern tim berners-lee 1989 1991 1993 website invention',
+ stamp:{b:4,at:2200,text:'FREE FOR ALL',bg:'#1d4ed8',top:'50%'},
+ beats:[
+  {d:3600,t:'*1989*. A scientist at *CERN* hands his boss a *plan*.'},
+  {d:4000,t:'*Tim* *Berners-Lee* wants linked pages that any computer can read.'},
+  {d:4200,t:'His boss writes three words on the front: *Vague*, *but* *exciting*.'},
+  {d:4200,t:'By *1990* it ran on one computer, labelled *DO* *NOT* *POWER* *IT* *DOWN*.'},
+  {d:4400,t:'In *1993*, CERN made the web\'s software *free* for anyone to use.'}],
+ quiz:{q:'What did his boss write on the plan?',c:'Vague but exciting',w:'Too expensive',ex:'Mike Sendall scribbled "Vague but exciting" on the proposal, and let Tim Berners-Lee keep working on it.'},
+ draw(b,lt,t){
+  if(b===0){bg('F_office');board(6,8,40,11,'CERN 1989','#fde68a');F_big('stand','F_boss',14,40,2);R(4,58,44,3,'#92400e');R(6,61,40,15,'#78350f');R(8,63,36,1,'#92400e');
+   const x=lt<2300?M(100,50,lt,0,2300):50;F_big(lt<2300?'walk':'stand','F_tim',x,50,2,true);const pp=P(lt,2400,3200);R(lerp(x-2,32,pp),lerp(62,55,pp),6,7,'#f8fafc');R(lerp(x-1,33,pp),lerp(64,57,pp),4,1,'#94a3b8');
+   if(lt<2300&&a.every(300,'st')>=0)a.sfx('step');if(lt>3200)hit('pp','pop')}
+  if(b===1){R(0,0,VW,VH,'#0b1021');const MN=[[8,8,'#f59e0b'],[66,8,'#22c55e'],[8,70,'#ec4899'],[66,70,'#38bdf8']],LK=[[0,1],[1,3],[3,2],[2,0],[0,3]];
+   const cur=Math.floor(lt/700)%5,q=(lt%700)/700;LK.forEach(([i,j],k)=>line(MN[i][0]+11,MN[i][1]+8,MN[j][0]+11,MN[j][1]+8,k===cur?'#fde68a':'#334155'));
+   MN.forEach(([x,y,c])=>{R(x,y,22,16,c);R(x+2,y+2,18,12,'#f8fafc');for(let r=0;r<3;r++)R(x+4,y+4+r*3,r===1?8:14,1,r===1?'#2563eb':'#94a3b8');R(x+9,y+16,4,3,'#475569')});
+   const [i,j]=LK[cur];R(lerp(MN[i][0]+8,MN[j][0]+8,q),lerp(MN[i][1]+5,MN[j][1]+5,q),6,7,'#fde68a');if(a.every(700,'lk')>=0)a.sfx('ping');ctext('LINKED PAGES',46,'#fde68a')}
+  if(b===2){R(0,0,VW,VH,'#78716c');R(10,4,76,98,'#f8fafc');R(10,4,76,1,'#e2e8f0');const S1='VAGUE BUT',S2='EXCITING';const n=Math.floor(P(lt,300,2800)*20);
+   text(S1.slice(0,Math.min(9,n)),13,18,'#1d4ed8',2);if(n>9)text(S2.slice(0,n-9),13,32,'#1d4ed8',2);for(let d=0;d<Math.min(3,n-17);d++)R(77+d*4,40,2,2,'#1d4ed8');
+   const pi=Math.min(n,17),px=pi<9?13+pi*8:13+(pi-9)*8,py=pi<9?18:32;line(px+2,py+10,px+8,py+2,'#111827',2);R(px+1,py+10,2,2,'#1d4ed8');if(n<20&&a.every(125,'wr')>=0)a.sfx('tick');
+   text('INFORMATION',16,54,'#334155');text('MANAGEMENT:',16,62,'#334155');text('A PROPOSAL',16,70,'#334155');for(let k=0;k<4;k++)R(16,80+k*5,k===3?36:62,1,'#cbd5e1')}
+  if(b===3){bg('F_office');board(4,4,28,11,'1990','#fde68a');R(0,66,VW,4,'#92400e');R(4,70,3,34,'#78350f');R(89,70,3,34,'#78350f');
+   R(6,36,36,26,'#1f2937');R(8,38,32,20,'#f8fafc');for(let k=0;k<4;k++)R(10,40+((k*4+Math.floor(lt/150))%18),k%2?24:16,1,k===1?'#2563eb':'#94a3b8');R(20,62,8,4,'#374151');
+   R(48,30,42,36,'#111111');R(48,30,42,1,'#3f3f46');R(89,30,1,36,'#27272a');R(86,60,2,2,BL(300)?'#22c55e':'#14532d');
+   const fl=lt>1200&&BL(250);R(51,34,36,22,fl?'#dc2626':'#f8fafc');R(52,35,34,20,'#f8fafc');[['DO NOT',37],['POWER IT',43],['DOWN!!',49]].forEach(([s,y])=>text(s,52+Math.round((34-tw(s))/2),y,'#dc2626'));if(lt>1200&&a.every(500,'al')>=0)a.sfx('beep')}
+  if(b===4){R(0,0,VW,VH,'#0b1021');stars(t);const n=Math.floor(P(lt,200,3200)*10);for(let i=0;i<10;i++){const an=i/10*Math.PI*2-Math.PI/2,x=48+Math.cos(an)*36,y=50+Math.sin(an)*36;if(i<n){line(48,50,x,y,'#1e40af');R(x-5,y-4,10,8,'#94a3b8');R(x-4,y-3,8,5,'#38bdf8');hit('m'+i,'pop')}}
+   disc(48,50,18,'#1d4ed8');const rot=t/60;for(let k=0;k<5;k++){const x=((k*15+rot)%40)-20;if(Math.abs(x)<16)disc(48+x,44+(k%3)*6,3+(k%2),'#16a34a')}board(4,4,28,11,'1993','#fde68a')}}
+});
+
+const F_CORE='#d97706';
+function F_torus(cx,cy,r,c){disc(cx,cy,r,c||F_CORE);disc(cx,cy,Math.max(1,Math.round(r*.55)),'#0f172a');F_ring(cx,cy,r,'#fbbf24')}
+K.push({id:'rope-memory',batch:'F',title:'APOLLO\'S WOVEN MEMORY',topic:'Tech',tags:'apollo 11 guidance computer rope memory moon landing nasa women weaving 1969',
+ beats:[
+  {d:3600,t:'Apollo 11\'s guidance computer had about *4* *KB* of working memory.'},
+  {d:3600,t:'Its programs were stored in *rope* *memory*. About *72* *KB*.'},
+  {d:4200,t:'Workers, mostly *women*, *wove* it by hand, threading wire through tiny *rings*.'},
+  {d:4000,t:'Wire *through* a ring meant *1*. Wire *around* it meant *0*.'},
+  {d:4400,t:'Your phone has *millions* of times more memory. Apollo still reached the *Moon*.'}],
+ quiz:{q:'How was Apollo\'s rope memory made?',c:'Woven by hand with wire',w:'Printed onto plastic film',ex:'Workers threaded copper wire through or around tiny magnetic rings. Through meant 1, around meant 0.'},
+ draw(b,lt,t){
+  if(b===0){R(0,0,VW,VH,'#1f2937');R(14,4,68,74,'#9ca3af');R(14,4,68,1,'#d1d5db');R(16,8,64,26,'#111');
+   text('PROG',19,11,'#4ade80');text(String(11+Math.floor(lt/900)%3*10),64,11,'#4ade80');text('VERB',19,19,'#4ade80');text('NOUN',48,19,'#4ade80');text('+'+String(10000+Math.floor(t/90)%89999).slice(0,5),28,27,'#4ade80');
+   const kp=Math.floor(lt/450)%18;for(let r=0;r<3;r++)for(let c=0;c<6;c++){const i=r*6+c;R(19+c*10,40+r*9,8,7,i===kp?'#fde68a':'#e5e7eb');R(19+c*10,46+r*9,8,1,'#6b7280')}text('APOLLO 11',26,70,'#111827');
+   ctext('4 KB',84,'#fde68a',3);if(a.every(450,'kp')>=0)a.sfx('beep')}
+  if(b===1){R(0,0,VW,VH,'#0f172a');ctext('ROPE MEMORY',4,'#fde68a');R(8,14,80,52,'#78716c');R(10,16,76,48,'#1c1917');
+   for(let w=0;w<9;w++){const y=20+w*5;for(let x=10;x<86;x++){const near=[0,1,2].some(r=>Math.abs(y-(28+r*12))<3);R(x,y+(near&&((x+w*3)%18<9)?((w%2)?-1:1):0),1,1,'#a8a29e')}}
+   for(let r=0;r<3;r++)for(let c=0;c<8;c++)F_torus(16+c*9,28+r*12,3);const pw=Math.floor(lt/600)%9,px=10+((lt%600)/600)*76;disc(px,20+pw*5,1,'#fde68a');R(px-1,20+pw*5,3,1,'#ffffff');
+   ctext('72 KB',74,'#fde68a',3);if(a.every(600,'pl')>=0)a.sfx('tick')}
+  if(b===2){R(0,0,VW,VH,'#d6d3d1');R(0,74,VW,30,'#78716c');board(4,4,40,11,'BY HAND','#fde68a');R(46,16,46,58,'#57534e');R(48,18,42,54,'#292524');
+   for(let r=0;r<4;r++)for(let c=0;c<4;c++)F_torus(54+c*10,26+r*12,3);for(let r=0;r<4;r++)R(48,26+r*12,42,1,'rgba(229,231,235,.5)');
+   F_big('stand','F_weaver',14,52,2);const st=Math.floor(lt/650),c=st%4,r=Math.floor(st/4)%4,ph=(lt%650)/650,tx=54+c*10,ty=26+r*12,nx=lerp(36,tx+4,Math.sin(ph*Math.PI)),ny=lerp(64,ty,Math.sin(ph*Math.PI));
+   line(30,62,nx,ny,'#fbbf24');line(nx,ny,nx+5,ny-3,'#e5e7eb',1);if(ph>.45&&ph<.6){spark(tx,ty,'#fde68a');hit('s'+st,'tick')}}
+  if(b===3){R(0,0,VW,VH,'#0f172a');text('THROUGH',8,16,'#e5e7eb');text('AROUND',56,16,'#e5e7eb');
+   F_torus(26,40,12);line(2,40,46,40,'#e5e7eb',1);const p1=((lt/8)%46);disc(2+p1,40,1,'#fde68a');
+   F_torus(70,40,12);const W=[[50,40],[56,40],[58,58],[82,58],[84,40],[94,40]];for(let i=0;i<W.length-1;i++)line(W[i][0],W[i][1],W[i+1][0],W[i+1][1],'#e5e7eb');
+   text('1',23,68,'#4ade80',3);text('0',67,68,'#f87171',3);const bits='10110100',n=Math.min(8,Math.floor(lt/400));ctext(bits.slice(0,n),92,'#fde68a',1);if(n<8&&a.every(400,'bt')>=0)a.sfx('beep')}
+  if(b===4){if(lt<2000){R(0,0,VW,VH,'#0b1021');R(50,6,36,64,'#111827');R(52,10,32,54,'#0f172a');const rows=Math.floor(P(lt,0,1600)*13);for(let r=0;r<rows;r++)for(let c=0;c<8;c++)R(54+c*4,12+r*4,3,3,(r+c)%3?'#38bdf8':'#7dd3fc');
+     R(14,60,2,2,'#fde68a');text('APOLLO',4,66,'#e5e7eb');text('PHONE',58,74,'#e5e7eb');ctext('MILLIONS X',86,'#fde68a',2);if(a.every(120,'gr')>=0)a.sfx('tick')}
+   else{bg('moon');const p=P(lt,2000,3400),y=lerp(4,50,p);lander(32,Math.round(y),2);if(p<1)for(let k=0;k<3;k++)R(44+k*2,y+20+((t/30+k*3)%6),1,2,'#fbbf24');else{hit('ld','thud');if(lt<3800)for(let i=0;i<2;i++)kick(46,70,'#d1d5db',true)}ctext('THE MOON',84,'#f8fafc',2)}}}
+});
+
+function F_rune(cx,y0,kind,c,h){h=h||32;line(cx,y0,cx,y0+h,c,2);if(kind==='H'){line(cx-7,y0+h*.2,cx+7,y0+h*.75,c,2);line(cx+7,y0+h*.2,cx-7,y0+h*.75,c,2)}
+ else{line(cx,y0,cx+8,y0+h*.25,c,2);line(cx+8,y0+h*.25,cx,y0+h*.5,c,2);line(cx,y0+h*.5,cx+8,y0+h*.75,c,2);line(cx+8,y0+h*.75,cx,y0+h,c,2)}}
+function F_king(x,y,k){F_big('stand','F_king',x,y,k);R(x+2*k,y-2*k,4*k,2*k,'#facc15');R(x+2*k,y-3*k,k,k,'#facc15');R(x+5*k,y-3*k,k,k,'#facc15');R(x+3*k,y-4*k,k,2*k,'#facc15');R(x+3*k,y+2*k,2*k,2*k,'#b45309')}
+function F_ship(x,y){poly([x,y,x+50,y,x+44,y+9,x+6,y+9],'#78350f');R(x+2,y,48,1,'#a16207');line(x+50,y,x+54,y-8,'#78350f',2);R(x+53,y-10,3,3,'#78350f');line(x,y,x-4,y-8,'#78350f',2);
+ for(let i=0;i<6;i++)disc(x+8+i*7,y+3,2,i%2?'#facc15':'#dc2626');R(x+24,y-34,2,34,'#57534e');for(let i=0;i<6;i++)R(x+13+i*4,y-32,4,24,i%2?'#f8fafc':'#b91c1c')}
+
+K.push({id:'bluetooth-king',batch:'F',title:'BLUETOOTH WAS A KING',topic:'Tech',tags:'bluetooth name king harald denmark norway viking runes logo wireless',
+ beats:[
+  {d:3600,t:'*Bluetooth* is named after a *king* who lived over *1,000* years ago.'},
+  {d:3600,t:'*Harald* *Bluetooth* ruled *Denmark* in the *900s*.'},
+  {d:3800,t:'He was known for *uniting* *Denmark* and *Norway* under one rule.'},
+  {d:4000,t:'In *1997*, an engineer picked his name as a *codename* for linking *devices*.'},
+  {d:4400,t:'The logo is his initials, *H* and *B*, joined together in *Viking* *runes*.'}],
+ quiz:{q:'What is the Bluetooth logo made from?',c:'A king\'s initials in runes',w:'A tooth on its side',ex:'It joins two runes, H and B, for Harald Bluetooth. Like his name, the tech was meant to bring things together.'},
+ draw(b,lt,t){
+  if(b===0){R(0,0,VW,VH,'#1e293b');ctext('BLUETOOTH',6,'#60a5fa',2);F_king(10,40,3);F_phone(70,42,14,26);
+   for(let j=0;j<3;j++){const r=((t/14)+j*10)%30;for(let an=2.5;an<3.8;an+=0.08)R(70+Math.cos(an)*r,55+Math.sin(an)*r,1,1,'rgba(96,165,250,'+(1-r/30).toFixed(2)+')')}
+   ctext('OVER 1000 YEARS AGO',92,'#fde68a');if(a.every(700,'wv')>=0)a.sfx('beep')}
+  if(b===1){grad('#93c5fd','#e0f2fe',0,60);clouds(t,6);const bob=Math.round(Math.sin(t/400)*1.5),sx=Math.round(lerp(14,30,lt/3600));F_ship(sx,62+bob);F_king(sx+36,42+bob,2);
+   R(0,70,VW,34,'#1e40af');for(let y=72;y<VH;y+=5)for(let k=0;k<5;k++)R(((k*23+y*3)+t*0.02)%110-8,y,6,1,'#3b82f6');board(15,88,66,11,'KING OF DENMARK','#fde68a');if(a.every(900,'wv')>=0)a.sfx('splash')}
+  if(b===2){R(0,0,VW,VH,'#1e3a8a');const m=P(lt,1600,2800);const NC=mix('#16a34a','#2563eb',m),DC=mix('#dc2626','#2563eb',m);
+   poly([30,4,62,4,66,20,60,40,52,52,42,56,38,44,36,20,42,10],'#64748b');poly([4,4,30,4,40,10,34,20,28,34,20,44,10,46,4,40],NC);
+   poly([30,62,38,58,42,66,40,80,36,92,28,92,26,78],DC);disc(50,80,4,DC);disc(58,86,3,DC);R(0,0,VW,VH,'rgba(0,0,0,0)');
+   text('NORWAY',6,16,'#f8fafc');text('DENMARK',44,66,'#f8fafc');if(lt<1600&&BL(300))for(let i=0;i<6;i++)R(26+i*1.5,46+i*2.2,1,1,'#fde68a');
+   if(m>0){const cy=Math.round(lerp(14,24,1-m));R(64,cy,12,4,'#facc15');R(64,cy-2,2,2,'#facc15');R(69,cy-3,2,3,'#facc15');R(74,cy-2,2,2,'#facc15');hit('cr','magic')}}
+  if(b===3){R(0,0,VW,VH,'#0f172a');board(4,90,28,11,'1997','#fde68a');F_note(36,8,40,22);text('CODENAME',40,13,'#78350f');const n=Math.floor(P(lt,1200,2600)*9);text('BLUETOOTH'.slice(0,n),38,21,'#1d4ed8');if(n>0&&n<9&&a.every(150,'ty')>=0)a.sfx('tick');
+   R(12,38,14,24,'#111827');R(14,41,10,17,'#60a5fa');R(34,70,28,16,'#334155');R(36,72,24,12,'#38bdf8');R(30,86,36,3,'#94a3b8');
+   for(let an=Math.PI;an<=Math.PI*2;an+=0.1)R(74+Math.cos(an)*9,50+Math.sin(an)*9,2,2,'#e5e7eb');R(63,48,5,9,'#1f2937');R(80,48,5,9,'#1f2937');
+   const P3=[[19,50],[48,78],[74,52]];for(let i=0;i<3;i++){const A=P3[i],B2=P3[(i+1)%3];for(let k=0;k<6;k++){const q=((lt/900)+k/6)%1;R(lerp(A[0],B2[0],q),lerp(A[1],B2[1],q),2,2,'#60a5fa')}}}
+  if(b===4){R(0,0,VW,VH,'#0b1021');const j=ease(P(lt,1400,2600)),hx=lerp(26,48,j),bx=lerp(66,48,j),on=lt>2600;
+   if(on){F_ell(48,40,17,26,'#2563eb');hit('lg','right')}F_rune(hx,24,'H',on?'#f8fafc':'#fde68a');F_rune(bx-4*j,24,'B',on?'#f8fafc':'#fde68a');
+   if(!on){text('H',Math.round(hx)-2,64,'#fde68a',2);text('B',Math.round(bx)-2,64,'#fde68a',2);if(a.once('rn'))a.sfx('magic')}else ctext('H + B',74,'#fde68a',2);if(lt>1400&&lt<2600&&a.every(300,'sl')>=0)a.sfx('tick')}}
+});
+
+function F_wmouse(x,y,k,flip){const r=(dx,dy,w,h,c)=>R(flip?x+(16-dx-w)*k:x+dx*k,y+dy*k,w*k,h*k,c);r(0,1,16,9,'#a16207');r(0,0,16,1,'#ca8a04');r(1,3,14,1,'#854d0e');r(2,6,12,1,'#854d0e');r(0,9,16,1,'#713f12');r(11,-1,3,2,'#dc2626')}
+const F_MOUSE=["........ee..","...ggggggeg.",".gggggggggkg","gggggggggggp",".gggggggggg.","..l..l..l..."];
+function F_cursor(x,y,k){sprF(["k...","kk..","kwk.","kwwk","kkkk"],{k:'#111827',w:'#f8fafc'},Math.round(x),Math.round(y),k||1)}
+
+K.push({id:'wooden-mouse',batch:'F',title:'THE WOODEN MOUSE',topic:'Tech',tags:'computer mouse first invention engelbart wood 1964 1968 demo',
+ beats:[
+  {d:3400,t:'The first computer *mouse* was a carved block of *wood*.'},
+  {d:4000,t:'*Douglas* *Engelbart* designed it. *Bill* *English* built it in *1964*.'},
+  {d:4200,t:'Underneath, two metal *wheels* tracked moves side to side, and up and down.'},
+  {d:3800,t:'The cord came out the back like a *tail*. So it got the name *mouse*.'},
+  {d:4400,t:'In *1968*, *Engelbart* showed it off, along with *video* *calls* and *linked* *text*.'}],
+ quiz:{q:'What was the first computer mouse made from?',c:'Wood',w:'Plastic',ex:'The 1964 prototype was a carved wooden box with two metal wheels underneath and one button on top.'},
+ draw(b,lt,t){
+  if(b===0){R(0,0,VW,VH,'#334155');R(0,64,VW,40,'#78350f');R(0,64,VW,1,'#a16207');ctext('THE FIRST MOUSE',6,'#fde68a');const dx=Math.round(Math.sin(t/500)*4);
+   for(let i=0;i<24;i++)R(4+i*1.0,52+Math.round(Math.sin(i/3+t/300)*2),1,1,'#1f2937');F_wmouse(26+dx,34,3);board(34,76,28,11,'WOOD','#fde68a');if(a.every(500,'mv')>=0)a.sfx('step')}
+  if(b===1){R(0,0,VW,VH,'#57534e');R(0,70,VW,34,'#44403c');R(0,66,VW,4,'#92400e');board(34,4,28,11,'1964','#fde68a');
+   R(6,22,22,18,'#f8fafc');R(10,28,12,8,'#d4a373');R(21,25,2,2,'#dc2626');line(10,32,7,36,'#334155');F_big('stand','F_doug',6,44,2);
+   F_big('stand','F_bill',60,46,2,true);R(48,60,16,6,'#ca8a04');R(48,60,16,1,'#fde68a');const cx=lerp(48,62,(lt%600)/600);line(cx,58,cx+4,54,'#94a3b8',1);if(a.every(200,'ch')>=0){kick(cx,60,'#fbbf24',true);a.sfx('tick')}
+   text('DESIGN',4,92,'#e5e7eb');text('BUILD',62,92,'#e5e7eb')}
+  if(b===2){R(0,0,VW,VH,'#1f2937');R(4,22,42,56,'#a16207');R(4,22,42,1,'#ca8a04');R(5,23,40,54,'#854d0e');const xs=lt<2100,sp=t/60;
+   R(10,40,24,6,xs?'#e5e7eb':'#6b7280');for(let i=0;i<4;i++)R(10+((i*6+(xs?sp:0))%24),40,1,6,'#374151');R(34,46,6,24,xs?'#6b7280':'#e5e7eb');for(let i=0;i<4;i++)R(34,46+((i*6+(xs?0:sp))%24),6,1,'#374151');
+   text('X',20,32,xs?'#fde68a':'#94a3b8',1);text('Y',40,38,xs?'#94a3b8':'#fde68a',1);R(52,22,40,32,'#94a3b8');R(54,24,36,28,'#0f172a');
+   const cx=xs?54+((lt/30)%28):70,cy=xs?34:24+(((lt-2100)/40)%18);R(54,cy+4,cx-54,1,xs?'#fde68a':'#0f172a');if(!xs)R(cx+1,24,1,cy-24,'#fde68a');F_cursor(cx,cy,2);text('SCREEN',60,58,'#e5e7eb');if(a.every(150,'wh')>=0)a.sfx('tick')}
+  if(b===3){R(0,0,VW,VH,'#334155');R(0,70,VW,34,'#78350f');R(0,70,VW,1,'#a16207');F_wmouse(54,52,2);for(let i=0;i<14;i++)R(86+i,62+Math.round(Math.sin(i/2+t/250)*2),1,1,'#1f2937');
+   sprF(F_MOUSE,{g:'#9ca3af',e:'#f9a8d4',k:'#111',p:'#f472b6',l:'#f9a8d4'},10,58,2,true);for(let i=0;i<12;i++)R(34+i,66+Math.round(Math.sin(i/2+t/200)*2),1,1,'#f9a8d4');
+   if(lt>1200){text('TAIL',34,76,'#fde68a');text('TAIL',80,76,'#fde68a')}if(lt>2200){ctext('MOUSE',14,'#fde68a',2);hit('ms','squeak')}}
+  if(b===4){R(0,0,VW,VH,'#111827');R(8,6,80,50,'#475569');R(10,8,76,46,'#0b1021');R(12,10,34,24,'#1e3a8a');disc(29,20,5,'#f1c27d');R(24,26,10,8,'#e5e7eb');R(50,10,34,24,'#14532d');disc(67,20,5,'#e8b27a');R(62,26,10,8,'#0e7490');
+   for(let k=0;k<3;k++)R(14,38+k*5,k===1?20:60,1,'#94a3b8');R(36,43,12,1,'#fde68a');const q=(lt%1600)/1600;line(48,43,lerp(48,70,q),lerp(43,48,q),'#fde68a');text('1968',66,46,'#fde68a');
+   if(BL(500))R(27,19,1,1,'#111');F_cursor(lerp(20,60,(Math.sin(t/600)+1)/2),40);guy(16,64,'stand','F_doug');R(12,72,16,3,'#78350f');
+   for(let x=2;x<VW;x+=7){const bb=Math.round(Math.sin(t/200+x)*1);disc(x+3,96+bb,3,crowdC[x%7]);R(x,99+bb,7,5,crowdC[(x*3)%7])}if(a.every(1600,'cl')>=0)a.sfx('ping')}}
+});
+
+/* ====================================================================== */
+/* BATCH G: Mind, History, Science, Sport                                 */
+/* ====================================================================== */
+/* extra pixel glyphs: pound sign, comma, apostrophe, degree */
+const G_GL={'£':'011010111010111',',':'000000000010100',"'":'010010000000000','°':'111101111000000'};
+function G_text(s,x,y,c,k){k=k||1;[...s].forEach((ch,n)=>{const g=G_GL[ch];if(g){for(let j=0;j<5;j++)for(let i=0;i<3;i++)if(g[j*3+i]==='1')R(x+(n*4+i)*k,y+j*k,k,k,c)}else text(ch,x+n*4*k,y,c,k)})}
+function G_ctext(s,y,c,k){G_text(s,Math.round((VW-tw(s,k))/2),y,c,k)}
+/* a kit person at any scale */
+function G_big(pose,look,x,y,k,flip,ph){const L=typeof look==='string'?LOOKS[look]:look;const tt=CT+(ph||0);let f=PS[pose]||PS.stand;
+ if(pose==='run')f=Math.floor(tt/140)%2?PS.run1:PS.run2;else if(pose==='walk')f=Math.floor(tt/240)%2?PS.run2:PS.stand;else if(pose==='cheer')f=Math.floor(tt/200)%2?PS.cheer1:PS.cheer2;
+ sprF(f,L,x,y,k||2,flip)}
+/* darkness everywhere except a circle */
+function G_dark(cx,cy,r,c){for(let y=0;y<VH;y++){const dy=y-cy;if(Math.abs(dy)>=r)R(0,y,VW,1,c);else{const w=Math.floor(Math.sqrt(r*r-dy*dy));R(0,y,Math.max(0,cx-w),1,c);R(cx+w,y,VW,1,c)}}}
+function G_tick(x,y,c){line(x,y+3,x+2,y+5,c||'#22c55e',2);line(x+2,y+5,x+7,y,c||'#22c55e',2)}
+function G_cross(x,y,c){line(x,y,x+6,y+6,c||'#ef4444',2);line(x+6,y,x,y+6,c||'#ef4444',2)}
+/* wall calendar page */
+function G_cal(x,y,head,big,foot,hc){R(x+1,y+1,36,40,'rgba(0,0,0,.35)');R(x,y,36,40,'#f8fafc');R(x,y,36,9,hc||'#dc2626');R(x+8,y-2,2,4,'#64748b');R(x+26,y-2,2,4,'#64748b');
+ text(head,Math.round(x+(36-tw(head))/2),y+2,'#fff');if(big)text(big,Math.round(x+(36-tw(big,3))/2),y+13,'#111827',3);if(foot)text(foot,Math.round(x+(36-tw(foot))/2),y+32,'#475569')}
+/* rainbow ring; f(x,y) gives opacity for each pixel */
+const G_RBC=['#ef4444','#f97316','#facc15','#22c55e','#3b82f6','#6366f1','#a855f7'];
+function G_rb(cx,cy,r,f){for(let i=0;i<7;i++)for(let d=0;d<2;d++){const rr=r-i*2-d,n=Math.ceil(rr*7);for(let j=0;j<n;j++){const an=j/n*Math.PI*2,x=cx+Math.cos(an)*rr,y=cy+Math.sin(an)*rr,al=f?f(x,y):1;if(al>0){o.globalAlpha=Math.min(1,al);R(x,y,1,1,G_RBC[i])}}}o.globalAlpha=1}
+Object.assign(LOOKS,{
+ G_wh:{h:'#4a2c1a',s:'#f1c27d',t:'#f8fafc',a:'#e2e8f0',l:'#334155',b:'#111'},
+ G_bk:{h:'#111',s:'#c68642',t:'#111827',a:'#374151',l:'#475569',b:'#111'},
+ G_fox:{h:'#3b2412',s:'#f1c27d',t:'#1d4ed8',a:'#f8fafc',l:'#f8fafc',b:'#111'},
+ G_fox2:{h:'#111',s:'#c68642',t:'#1d4ed8',a:'#f8fafc',l:'#f8fafc',b:'#111'},
+ G_jump:{h:'#a16207',s:'#f1c27d',t:'#dc2626',a:'#f8fafc',l:'#1e3a8a',b:'#f8fafc'},
+ G_old:{h:'#3f2a20',s:'#e8b27a',t:'#f8fafc',a:'#cbd5e1',l:'#1f2937',b:'#111'},
+ G_night:{h:'#4a2c1a',s:'#f1c27d',t:'#e2e8f0',a:'#cbd5e1',l:'#e2e8f0',b:'#f1c27d'}
+});
+
+/* ---------------- 1. THE INVISIBLE GORILLA ---------------- */
+BG.G_hall=(t,o)=>{R(0,0,VW,VH,'#e7e5e4');R(0,0,VW,5,'#d6d3d1');[[8,28],[60,28]].forEach(([x,w])=>{R(x,12,w,42,'#a8a29e');R(x+2,14,w/2-2,40,'#cbd5e1');R(x+w/2,14,w/2-2,40,'#cbd5e1');R(x+w/2-1,14,1,40,'#78716c');R(x+w/2-3,6,6,4,'#1f2937');R(x+w/2-1,7,2,2,'#f59e0b')});
+ R(0,54,VW,50,'#b45309');for(let y=58;y<VH;y+=6)R(0,y,VW,1,'#92400e')};
+const G_GOR=["....kkkk....","...kkkkkk...","...kggggk...","...kwggwk...","...kggggk...","....kkkk....","..kkkkkkkk..",".kkkkkkkkkk.","kkkkkkkkkkkk","kk.kkkkkk.kk","kk.kkkkkk.kk","kg.kkkkkk.gk","...kkkkkk...","...kk..kk...","..kkk..kkk.."];
+const G_GORT=G_GOR.slice(0,8).concat([".kkggkkggkk.","..kkggggkk..","..kkkkkkkk..","...kkkkkk...","...kkkkkk...","...kk..kk...","..kkk..kkk.."]);
+const G_GORW=G_GOR.slice(0,13).concat(["...kk...kk..","..kkk....kk."]);
+const G_GORP={k:'#1c1917',g:'#57534e',w:'#f8fafc'};
+const G_WH=[[12,38],[42,34],[72,40]],G_BK=[[26,56],[56,58],[78,64]];
+function G_players(t){const pos=(p,i,s)=>[p[0]+Math.round(Math.sin(t/700+i*2.1)*s),p[1]+Math.round(Math.cos(t/900+i*1.3)*2)];
+ return{w:G_WH.map((p,i)=>pos(p,i,5)),b:G_BK.map((p,i)=>pos(p,i+3,6))}}
+function G_ball(t,W){const i=Math.floor(t/650),p=(t%650)/650,A=W[i%3],B=W[(i+1)%3];return[lerp(A[0]+8,B[0]+8,p),lerp(A[1]+9,B[1]+9,p)-Math.sin(p*Math.PI)*10,i]}
+K.push({id:'invisible-gorilla',batch:'G',title:'THE INVISIBLE GORILLA',topic:'Mind',tags:'invisible gorilla attention inattentional blindness psychology experiment video focus brain',
+ stamp:{b:4,at:2600,text:'MISSED IT',bg:'#dc2626',top:'14%'},
+ beats:[
+  {d:3800,t:'Watch a short video. Count how many times the team in *white* passes the ball.'},
+  {d:3600,t:'Easy. You *focus* hard and follow every single *pass*.'},
+  {d:4000,t:'Halfway through, a person in a *gorilla* *suit* strolls into the middle.'},
+  {d:4000,t:'It faces the camera, thumps its *chest*, then walks off.'},
+  {d:4600,t:'In the *1999* study, about *half* the viewers never saw it.'}],
+ quiz:{q:'In the famous study, how many viewers missed the gorilla?',c:'About half of them',w:'Fewer than 1 in 50',ex:'Simons and Chabris found about half of people counting passes never noticed the gorilla. Focus can hide the obvious.'},
+ draw(b,lt,t){
+  if(b<=3){bg('G_hall');const P6=G_players(t),[bx,by,n]=G_ball(t,P6.w);
+   let gx=null,gf=G_GOR;
+   if(b===2&&lt>500){gx=Math.round(M(100,36,lt,500,3400));gf=lt<3400?(Math.floor(t/220)%2?G_GORW:G_GOR):G_GOR}
+   if(b===3){if(lt<2600){gx=36;gf=Math.floor(t/160)%2?G_GORT:G_GOR;if(lt>200&&lt<2400&&a.every(160,'th')>=0)a.sfx('drum')}else{gx=Math.round(M(36,-30,lt,2600,3900));gf=Math.floor(t/220)%2?G_GORW:G_GOR}}
+   P6.w.slice(0,2).forEach(([x,y],i)=>G_big('stand','G_wh',x,y,2,i%2,i*90));G_big('stand','G_wh',P6.w[2][0],P6.w[2][1],2,true);
+   if(gx!==null)sprF(gf,G_GORP,gx,38,2);
+   P6.b.forEach(([x,y],i)=>G_big(Math.floor((t+i*200)/300)%2?'walk':'stand','G_bk',x,y,2,i===1,i*120));
+   disc(bx,by,2,'#f97316');R(bx-1,by-1,1,1,'#fdba74');
+   if(a.every(650,'ps')>=0)a.sfx('bounce');
+   if(b===1)G_dark(Math.round(bx),Math.round(by),Math.round(lerp(70,16,P(lt,0,1400))),'rgba(0,0,0,.72)');
+   if(b===2)G_dark(Math.round(bx),Math.round(by),16,'rgba(0,0,0,.72)');
+   if(b===3)G_dark(Math.round(bx),Math.round(by),Math.round(lerp(16,90,P(lt,0,900))),'rgba(0,0,0,.72)');
+   board(26,2,44,11,'PASSES '+n,'#fde68a');
+   if(b===2&&lt>2400&&BL(300))text('?',84,40,'#ef4444',2);
+   if(b===3&&lt<2600&&lt>300)ctext('THUMP',90,'#fde68a');
+   if(b===2)hit('g','creak')}
+  if(b===4){R(0,0,VW,VH,'#1e1b4b');R(10,3,76,16,'#e7e5e4');R(10,15,76,4,'#b45309');for(let i=0;i<5;i++)R(14+i*15+Math.round(Math.sin(t/300+i)*3),8,3,6,i%2?'#111827':'#f8fafc');
+   const MISS=[0,2,3,6,9];
+   for(let i=0;i<10;i++){const r=Math.floor(i/5),x=4+(i%5)*18,y=r?66:34;G_big('stand',['plain','red','green','white','farmer','tennis2','egypt','monk','aztec','police'][i],x,y,2,false);
+    const s=400+i*160;if(lt>s){const m=MISS.includes(i);R(x+3,y-11,10,9,m?'#e5e7eb':'#4ade80');R(x+6,y-2,2,2,m?'#e5e7eb':'#4ade80');text(m?'?':'!',x+7,y-9,m?'#475569':'#14532d');hit('p'+i,m?'pop':'beep')}}
+   if(lt>2300)board(4,90,88,12,'ABOUT HALF MISSED IT','#fca5a5')}
+ }});
+
+/* ---------------- 2. FOLD PAPER TO THE MOON ---------------- */
+function G_th(n){const mm=0.1*Math.pow(2,n);if(mm<10)return mm.toFixed(1)+' MM';if(mm<1000)return Math.round(mm/10)+' CM';if(mm<1e6)return Math.round(mm/1000)+' M';return Math.round(mm/1e6)+' KM'}
+function G_stack(x,y0,w,h){if(h<1)h=1;R(x,y0-h,w,h,'#f8fafc');if(h>6)for(let y=y0-h+2;y<y0;y+=3)R(x,y,w,1,'#cbd5e1');R(x+w-1,y0-h,1,h,'#94a3b8')}
+BG.G_desk=(t,o)=>{R(0,0,VW,VH,'#334155');for(let x=0;x<VW;x+=12)R(x,0,1,80,'#3b4a61');R(0,80,VW,24,'#92400e');R(0,80,VW,2,'#b45309');for(let y=86;y<VH;y+=5)R((y*13)%40,y,30,1,'#78350f')};
+K.push({id:'paper-fold-moon',batch:'G',title:'FOLD PAPER TO THE MOON',topic:'Mind',tags:'paper folding maths doubling exponential moon space growth numbers',
+ stamp:{b:4,at:2900,text:'PAST THE MOON',bg:'#7c3aed',top:'58%'},
+ beats:[
+  {d:3800,t:'Take a sheet of paper about *0.1* *mm* thick. Fold it in *half*.'},
+  {d:3800,t:'Each fold *doubles* the thickness. After *10* folds, it is about *10* *cm*.'},
+  {d:3800,t:'After *20* folds, it is about *100* *metres*. Taller than *Big* *Ben*.'},
+  {d:3800,t:'After *30* folds, it is over *100* *km* thick. That reaches *space*.'},
+  {d:4600,t:'And after just *42* folds, it would stretch past the *Moon*.'}],
+ quiz:{q:'About how many folds would reach the Moon?',c:'42',w:'About 4,200',ex:'Each fold doubles the thickness. 0.1 mm doubled 42 times is about 440,000 km, past the Moon.'},
+ draw(b,lt,t){
+  if(b===0){bg('G_desk');const p1=P(lt,900,1600),p2=P(lt,2200,2900);
+   if(p1<1){R(24,40,24,32,'#f8fafc');const w=Math.round(24*Math.cos(Math.PI*p1));if(w>=0)R(48,40,w,32,'#f1f5f9');else R(48+w,40,-w,32,'#cbd5e1');R(47,40,1,32,'#e2e8f0')}
+   else{const h=Math.round(16*Math.cos(Math.PI*p2));R(24,56,24,16,'#f8fafc');if(h>=0)R(24,56-h,24,h,'#f1f5f9');else R(24,56,24,-h,'#cbd5e1');R(47,40+(p2>0?16:0),1,p2>0?16:32,'#94a3b8')}
+   if(lt>900)hit('f1','swing');if(lt>2200)hit('f2','swing');
+   ctext('0.1 MM THICK',12,'#fde68a');board(30,86,36,12,'FOLDS '+(p2>=1?2:p1>=1?1:0),'#fde68a')}
+  if(b===1){bg('G_desk');const n=lerp(1,10,P(lt,200,3000)),h=60*Math.pow(2,n-10);G_stack(30,80,26,h);
+   R(68,20,2,60,'#e5e7eb');for(let k=0;k<=10;k++)R(70,80-k*6,k%5?2:4,1,'#e5e7eb');text('10 CM',60,13,'#e5e7eb');
+   hit('n'+Math.floor(n),'pop');board(4,2,40,11,'FOLDS '+Math.floor(n),'#fde68a');text(G_th(Math.floor(n)),28,90,'#fde68a')}
+  if(b===2){grad('#7dd3fc','#e0f2fe',0,90);clouds(t,8);R(0,90,VW,14,'#57534e');R(0,90,VW,1,'#a8a29e');
+   R(62,34,12,56,'#a16207');R(60,32,16,3,'#854d0e');poly([62,32,68,20,74,32],'#3f3f46');disc(68,40,4,'#fef3c7');R(68,38,1,3,'#111');R(68,40,2,1,'#111');for(let y=50;y<88;y+=6)R(65,y,6,3,'#713f12');
+   text('BIG BEN',54,94,'#f8fafc');
+   const n=lerp(11,20,P(lt,200,3000)),h=64*Math.pow(2,n-20);G_stack(28,90,10,h);hit('n'+Math.floor(n),'pop');
+   board(2,2,40,11,'FOLDS '+Math.floor(n),'#fde68a');text(G_th(Math.floor(n)),20,Math.max(14,82-h),'#111827')}
+  if(b===3){const p=P(lt,0,3200);grad(mix('#7dd3fc','#020617',p),mix('#e0f2fe','#1e1b4b',p),0,VH);if(p>.5){o.globalAlpha=(p-.5)*2;stars(t);o.globalAlpha=1}
+   for(let k=0;k<4;k++){const y=((k*34+lt*0.05)%150)-20;R((k*29)%80,y,16,3,'rgba(255,255,255,'+(1-p).toFixed(2)+')')}
+   const top=Math.round(lerp(0,44,P(lt,2400,3400)));R(43,top,10,VH-top,'#f8fafc');for(let y=top+2;y<VH;y+=3)R(43,y,10,1,'#cbd5e1');
+   const n=Math.floor(lerp(21,30,P(lt,0,3000)));hit('n'+n,'pop');board(2,2,40,11,'FOLDS '+n,'#fde68a');
+   if(lt>2600){for(let x=0;x<VW;x+=6)R(x,top,3,1,'#c4b5fd');text('SPACE',2,top+4,'#c4b5fd');hit('sp','ping')}
+   text(G_th(n),56,92,'#fde68a')}
+  if(b===4){bg('space');disc(10,98,22,'#1d4ed8');disc(6,94,8,'#15803d');disc(16,100,5,'#15803d');disc(76,28,7,'#e5e7eb');disc(74,26,2,'#9ca3af');disc(79,31,1,'#9ca3af');text('MOON',68,38,'#e5e7eb');
+   const n=lerp(31,42,P(lt,200,2900)),f=Math.min(1.144,Math.pow(2,n-42)*1.144),x1=lerp(22,76,f),y1=lerp(84,28,f);line(22,84,x1,y1,'#fde68a',2);
+   const ni=Math.floor(n);hit('n'+ni,ni===42?'right':'pop');board(2,2,40,11,'FOLDS '+ni,'#fde68a');board(30,90,60,11,G_th(ni),'#fde68a')}
+ }});
+
+/* ---------------- 3. EVERY SHUFFLE IS NEW ---------------- */
+BG.G_felt=(t,o)=>{R(0,0,VW,VH,'#14532d');for(let y=2;y<VH;y+=6)for(let x=(y%12?0:3);x<VW;x+=6)R(x,y,1,1,'#166534');R(0,0,VW,2,'#78350f');R(0,VH-2,VW,2,'#78350f')};
+function G_pc(x,y,red,back,k){k=k||1;const w=10*k,h=14*k;R(x,y,w,h,back?'#1d4ed8':'#f8fafc');R(x,y,w,1,'#94a3b8');R(x,y+h-1,w,1,'#94a3b8');
+ if(back){for(let j=2;j<h-2;j+=3)for(let i=2;i<w-2;i+=3)R(x+i,y+j,1,1,'#93c5fd')}else{const c=red?'#dc2626':'#111827';disc(x+w/2,y+h/2,2*k,c);R(x+1,y+1,k,2*k,c)}}
+const G_52F='80658175170943878571660636856403766975289505440883277824000000000000';
+function G_prod(n){let p=1n;for(let i=0;i<n;i++)p*=BigInt(52-i);return p.toString()}
+K.push({id:'deck-shuffle',batch:'G',title:'EVERY SHUFFLE IS NEW',topic:'Mind',tags:'cards deck shuffle maths factorial probability numbers big bang 52',
+ beats:[
+  {d:3800,t:'Shuffle a deck of cards *properly*. That order has *probably* never existed before.'},
+  {d:3800,t:'Why? The first card has *52* choices. Then *51*. Then *50*.'},
+  {d:3800,t:'Multiply them all the way down to *1*. The number explodes.'},
+  {d:4000,t:'It has *68* *digits*. About *8* followed by *67* more digits.'},
+  {d:4400,t:'Shuffle once a second since the *Big* *Bang*, and you barely scratch it.'}],
+ quiz:{q:'Why is a well shuffled deck almost surely unique?',c:'There are too many possible orders',w:'Every deck is printed slightly differently',ex:'52 cards can be ordered in about 8 followed by 67 digits ways, far more than all the shuffles ever made.'},
+ draw(b,lt,t){bg('G_felt');
+  if(b===0){const n=Math.floor(P(lt,200,2200)*20);for(let i=0;i<3;i++){G_pc(12+i,46-i,false,true);G_pc(72-i,46-i,false,true)}
+   for(let i=0;i<n;i++)G_pc(43,50-Math.floor(i/3),false,true);
+   if(lt<2200){const p=(lt%110)/110,s=Math.floor(lt/110)%2;G_pc(Math.round(lerp(s?72:12,43,p)),Math.round(46-Math.sin(p*Math.PI)*10),false,true);if(a.every(110,'rf')>=0)a.sfx('tick')}
+   ctext('SHUFFLE',14,'#fde68a');
+   if(lt>2400){hit('fan','magic');for(let i=0;i<7;i++){const x=Math.round(M(43,6+i*12,lt,2400,2900));G_pc(x,72,i%3===1,false)}if(BL(300))ctext('NEW ORDER',30,'#4ade80')}}
+  if(b===1){const picks=[300,1500,2600],taken=picks.filter(s=>lt>s).length;
+   for(let i=0;i<52;i++){const gone=(i===17&&taken>0)||(i===40&&taken>1)||(i===5&&taken>2);if(!gone)R(3+(i%13)*7,16+Math.floor(i/13)*9,6,8,Math.floor(i/13)%2?'#fecaca':'#f8fafc')}
+   [17,40,5].forEach((ci,k)=>{const s=picks[k];if(lt<s)return;const p=P(lt,s,s+500),sx=3+(ci%13)*7,sy=16+Math.floor(ci/13)*9;G_pc(Math.round(lerp(sx,8+k*24,p)),Math.round(lerp(sy,54,p)),k===1,false);
+    if(p>=1)text(String(52-k),8+k*24-1,74,'#fde68a',2);hit('pk'+k,'pop')});
+   if(lt>3000&&BL(300))text('...',78,80,'#fde68a')}
+  if(b===2){const n=Math.max(1,Math.min(52,1+Math.floor(P(lt,0,3200)*52)));hit('m'+n,'tick');
+   let s='';for(let i=0;i<n&&i<52;i++)s+=(i?'X':'')+(52-i);const vis=s.slice(Math.max(0,s.length-22));text(vis,4,18,'#fde68a');R(0,26,VW,1,'#166534');
+   const d=G_prod(n);for(let r=0;r*17<d.length;r++)text(d.slice(r*17,r*17+17),14,34+r*9,'#f8fafc');
+   board(18,88,60,12,d.length+' DIGITS','#fde68a')}
+  if(b===3){for(let r=0;r<4;r++){const row=G_52F.slice(r*17,r*17+17);for(let i=0;i<17;i++){const idx=r*17+i,sweep=Math.floor(P(lt,300,2600)*68);text(row[i],14+i*4,26+r*9,idx===0?'#facc15':idx<sweep?'#86efac':'#f8fafc')}}
+   if(lt>300&&lt<2600&&a.every(90,'sw')>=0)a.sfx('tick');
+   if(lt>2600){hit('d','ping');ctext('68 DIGITS',68,'#fde68a',2)}ctext('ORDERS',12,'#cbd5e1')}
+  if(b===4){if(lt<900){R(0,0,VW,VH,'#020617');const r=Math.round(lt/20);for(let k=0;k<24;k++){const an=k/24*Math.PI*2;R(48+Math.cos(an)*r,44+Math.sin(an)*r,2,2,k%2?'#fde68a':'#f97316')}if(lt<200)FL=.8;hit('bb','bang')}
+   else{R(0,0,VW,VH,'#020617');stars(t);ctext('1 SHUFFLE A SECOND',16,'#e5e7eb');ctext('SINCE THE BIG BANG',24,'#e5e7eb');
+    text('ALL ORDERS',8,38,'#cbd5e1');R(8,46,80,8,'#4ade80');text('SHUFFLED',8,60,'#cbd5e1');R(8,68,80,8,'#1e293b');if(BL(250))R(8,68,1,8,'#facc15');
+    if(lt>2400){board(8,82,80,12,'ALMOST 0%','#fca5a5');hit('z','sting')}}}
+ }});
+
+/* ---------------- 4. THE STROOP EFFECT ---------------- */
+const G_COL={RED:'#ef4444',BLUE:'#3b82f6',GREEN:'#22c55e',YELLOW:'#facc15'};
+K.push({id:'stroop-effect',batch:'G',title:'THE STROOP EFFECT',topic:'Mind',tags:'stroop effect colour words reading brain attention psychology test',
+ stamp:{b:2,at:2400,text:'SLOWER',bg:'#dc2626',top:'88%'},
+ beats:[
+  {d:3800,t:'Quick test. Say the *colour* of each word, not the word itself.'},
+  {d:3800,t:'Easy when they match. Now try *these* ones.'},
+  {d:4200,t:'Most people *slow* *down* and make more *mistakes*.'},
+  {d:3800,t:'Your brain *reads* the word *automatically*. You cannot easily switch it off.'},
+  {d:4400,t:'It is the *Stroop* *effect*, from *1935*. One of the most repeated results in psychology.'}],
+ quiz:{q:'Why are clashing colour words slow to name?',c:'Your brain reads them anyway',w:'The ink is harder to see',ex:'Reading is so automatic that the word fights with the ink colour you are trying to name.'},
+ draw(b,lt,t){R(0,0,VW,VH,'#0f172a');R(2,2,92,100,'#111827');
+  if(b===0||b===1){const W=b===0?[['RED','RED'],['BLUE','BLUE'],['GREEN','GREEN'],['YELLOW','YELLOW']]:[['RED','GREEN'],['BLUE','YELLOW'],['GREEN','RED'],['YELLOW','BLUE']];
+   ctext('SAY THE COLOUR',8,'#e5e7eb');
+   W.forEach(([w,c],i)=>{const s=300+i*750;if(lt<s)return;const y=22+i*19;text(w,10,y,G_COL[c],2);hit('w'+i,'pop');
+    if(b===0&&lt>s+300){G_tick(76,y+2);hit('k'+i,'beep')}
+    if(b===1&&lt>s+300&&BL(260))text('?',78,y,'#e5e7eb',2)})}
+  if(b===2){ctext('GREEN',8,'#ef4444',2);G_big('stand','plain',6,26,2);
+   R(28,28,46,14,'#f8fafc');R(30,42,4,2,'#f8fafc');
+   if(lt<1500){if(lt>400){text('GREEN',34,33,'#111827');if(lt>900){G_cross(64,32);hit('x','wrong')}}}
+   else{text('RED',34,33,'#111827');G_tick(62,31);hit('r','beep')}
+   text('MATCH',4,64,'#cbd5e1');R(28,63,Math.round(lerp(0,22,P(lt,1800,2300))),7,'#22c55e');
+   text('CLASH',4,80,'#cbd5e1');R(28,79,Math.round(lerp(0,58,P(lt,2000,3600))),7,'#ef4444');
+   if(lt>2000&&lt<3600&&a.every(140,'cl')>=0)a.sfx('tick');if(lt>1800&&BL(250))disc(14,30,1,'#7dd3fc')}
+  if(b===3){disc(40,42,16,'#f9a8d4');disc(56,42,16,'#f9a8d4');disc(48,34,14,'#f9a8d4');for(let k=0;k<5;k++)line(30+k*8,32+(k%2)*6,34+k*8,48-(k%2)*6,'#db2777');
+   const WL=['RED','BLUE','GREEN','YELLOW'];for(let k=0;k<3;k++){const p=((t/1400)+k/3)%1,w=WL[(k+Math.floor(t/1400))%4];o.globalAlpha=Math.min(1,(1-p)*2);text(w,Math.round(lerp(-20,40,p)),10+k*8,G_COL[WL[(k+1)%4]]);o.globalAlpha=1}
+   R(30,72,36,14,'#334155');R(30,72,36,1,'#64748b');const tr=Math.max(0,Math.sin(lt/300))*0.6,kx=Math.round(lerp(54,34,tr));R(kx,74,10,10,'#4ade80');text('ON',kx+1,76,'#14532d');
+   if(tr>.5&&a.every(600,'gl')>=0)a.sfx('glitch');ctext('READING',92,'#e5e7eb')}
+  if(b===4){const C=['#3b82f6','#facc15','#22c55e','#ef4444','#f97316','#a855f7'];[...'STROOP'].forEach((ch,i)=>text(ch,14+i*12,18+Math.round(Math.sin(t/200+i)*2),C[(i+Math.floor(t/600))%6],3));
+   ctext('1935',48,'#e5e7eb',2);hit('s','sting');
+   const WL=['RED','BLUE','GREEN','YELLOW'],i=Math.floor(t/500);ctext(WL[i%4],76,G_COL[WL[(i+2)%4]],2);if(a.every(500,'cy')>=0)a.sfx('pop')}
+ }});
+
+/* ---------------- 5. THE 11 LOST DAYS (1752) ---------------- */
+function G_room(day){const w=mix('#1e1b4b','#fde68a',day);R(0,0,VW,VH,w);R(0,80,VW,24,'#78350f');for(let x=0;x<VW;x+=10)R(x,80,1,24,'#5b2a0e');
+ R(6,10,26,24,'#3f2a20');R(8,12,22,20,mix('#0b1a33','#7dd3fc',day));R(18,12,2,20,'#3f2a20');R(8,21,22,2,'#3f2a20');if(day<.5){disc(13,17,3,'#f1f5f9');disc(14,16,2,mix('#0b1a33','#7dd3fc',day))}else disc(25,17,3,'#fde047')}
+function G_bed(){R(6,70,52,4,'#7c2d12');R(6,62,4,18,'#5b2a0e');R(54,66,4,14,'#5b2a0e');R(10,74,2,6,'#5b2a0e');R(50,74,2,6,'#5b2a0e')}
+K.push({id:'calendar-1752',batch:'G',title:'THE 11 LOST DAYS',topic:'History',tags:'calendar 1752 britain gregorian julian dates tax year april eleven days',
+ stamp:{b:1,at:2500,text:'11 DAYS GONE',bg:'#b91c1c',top:'80%'},
+ beats:[
+  {d:3600,t:'Britain, *1752*. People go to bed on *Wednesday* *2* *September*.'},
+  {d:3800,t:'They wake up on *Thursday* *14* *September*. Eleven days, skipped.'},
+  {d:3800,t:'Britain was switching to the *Gregorian* calendar, already used across much of *Europe*.'},
+  {d:4000,t:'The old *Julian* year ran about *11* *minutes* too long. Over centuries, that added up.'},
+  {d:4400,t:'Tax years kept their days, so UK tax years still start on *6* *April*.'}],
+ quiz:{q:'In Britain, which date came after 2 September 1752?',c:'14 September',w:'3 September',ex:'Britain dropped 11 days to switch to the Gregorian calendar, so 2 September was followed by 14 September.'},
+ draw(b,lt,t){
+  if(b===0){G_room(0);G_bed();R(10,62,10,6,'#e5e7eb');sprF(PS.lie,LOOKS.G_night,12,64,2);R(26,64,30,6,'#1d4ed8');R(26,64,30,1,'#3b82f6');zz(30,54);
+   G_cal(56,10,'WED','2','SEP 1752');R(72,58,4,8,'#fef3c7');R(73,55+Math.round(Math.sin(t/120)),2,3,BL(140)?'#f97316':'#facc15');if(a.every(1400,'z')>=0)a.sfx('hum')}
+  if(b===1){G_room(P(lt,0,800));G_bed();
+   const n=Math.min(14,2+Math.floor(P(lt,500,2400)*12));
+   if(lt<500){sprF(PS.lie,LOOKS.G_night,12,64,2)}else{G_big(lt>2400?'cheer':'stand','G_night',20,44,2)}
+   G_cal(56,10,n>=14?'THU':'...',String(n),'SEP 1752');
+   if(lt>500&&lt<2400){const p=(lt%160)/160;o.globalAlpha=1-p;R(56+p*20,10+p*50,36,30,'#f8fafc');o.globalAlpha=1;if(a.every(160,'fl')>=0)a.sfx('tick')}
+   if(lt>2400&&BL(300))text('!',36,32,'#dc2626',2)}
+  if(b===2){R(0,0,VW,VH,'#1e293b');text('OLD',16,8,'#e5e7eb');text('NEW',66,8,'#e5e7eb');
+   G_cal(4,18,'JULIAN','','','#92400e');G_cal(56,18,'GREGORIAN','','','#1d4ed8');
+   for(let j=0;j<4;j++)for(let i=0;i<5;i++){R(8+i*6,30+j*6,4,4,'#d6d3d1');R(60+i*6,30+j*6,4,4,'#bfdbfe')}
+   const p=ease(P(lt,600,2400)),x=Math.round(lerp(10,62,p));line(14,68,80,68,'#64748b');poly([80,65,86,68,80,71],'#64748b');board(x-4,62,32,12,'UK','#fde68a');
+   if(lt>600)hit('mv','swing');if(lt>2400){hit('dn','right');ctext('MOST OF EUROPE',86,'#93c5fd')}
+   for(let k=0;k<5;k++)if(lt>2400)disc(16+k*16,98,1,BL(200+k*40)?'#93c5fd':'#1d4ed8')}
+  if(b===3){R(0,0,VW,VH,'#020617');stars(t);disc(48,48,7,'#facc15');disc(48,48,5,'#fde047');
+   for(let i=0;i<60;i++){const an=i/60*Math.PI*2;R(48+Math.cos(an)*34,48+Math.sin(an)*20,1,1,'#334155')}
+   const an=t/500;disc(48+Math.cos(an)*34,48+Math.sin(an)*20,3,'#3b82f6');R(48+Math.cos(an)*34-1,48+Math.sin(an)*20-1,2,1,'#22c55e');
+   const drift=Math.floor(P(lt,1200,3600)*11);const da=-Math.PI/2-drift*0.06;R(48+Math.cos(-Math.PI/2)*34,48-20-6,1,6,'#e5e7eb');R(48+Math.cos(da)*34-1,48+Math.sin(da)*20-6,2,6,'#ef4444');
+   ctext(lt<1600?'+11 MIN A YEAR':'DRIFT '+drift+' DAYS',4,'#fde68a');if(lt>1200&&a.every(220,'dr')>=0&&drift<11)a.sfx('tick');
+   board(14,84,68,12,lt<1600?'JULIAN YEAR':'BY 1752: 11 DAYS','#fca5a5')}
+  if(b===4){R(0,0,VW,VH,'#e7e5e4');R(0,84,VW,20,'#a8a29e');ctext('UK TAX YEAR',6,'#1f2937');G_cal(30,22,'APRIL','6','STARTS','#15803d');
+   for(let k=0;k<6;k++){const p=((t/1100)+k/6)%1;const x=k%2?8+k*2:78-k*2;disc(x,lerp(12,80,p),3,'#facc15');R(x-1,lerp(12,80,p)-1,2,1,'#fef3c7')}
+   for(let k=0;k<5;k++){R(4,80-k*3,10,3,'#ca8a04');R(82,80-k*3,10,3,'#ca8a04')}
+   if(lt>1400){ctext('+11 DAYS KEPT',70,'#15803d');hit('k','pop')}if(a.every(550,'c')>=0)a.sfx('beep')}
+ }});
+
+/* ---------------- 6. SWEDEN SWITCHES SIDES (DAGEN H) ---------------- */
+BG.G_road=(t,o)=>{R(0,0,VW,VH,'#4d7c0f');for(let k=0;k<20;k++)R((k*37)%26+(k%2?70:0),(k*23)%VH,2,1,'#65a30d');R(28,0,40,VH,'#374151');R(29,0,1,VH,'#e5e7eb');R(66,0,1,VH,'#e5e7eb');for(let y=0;y<VH;y+=10)R(47,y,2,6,'#facc15');
+ [[8,20],[86,60],[10,78],[84,14]].forEach(([x,y])=>{disc(x,y,5,'#166534');disc(x-1,y-1,3,'#15803d')})};
+function G_car(x,y,c,down){x=Math.round(x);y=Math.round(y);R(x,y,10,14,c);R(x-1,y+2,1,3,'#111');R(x+10,y+2,1,3,'#111');R(x-1,y+9,1,3,'#111');R(x+10,y+9,1,3,'#111');
+ const f=down?y+14:y;R(x+2,down?y+8:y+3,6,3,'#bae6fd');R(x+2,down?y+2:y+10,6,2,'#64748b');R(x+1,down?f-1:f,2,1,'#fef08a');R(x+7,down?f-1:f,2,1,'#fef08a')}
+const G_CC=['#dc2626','#f8fafc','#2563eb','#f59e0b','#7c3aed','#0891b2'];
+function G_traffic(t,right){for(let k=0;k<3;k++){const yu=((k*48-t*0.035)%144+144)%144-20,yd=((k*48+24+t*0.035)%144)-20;G_car(right?54:32,yu,G_CC[k],false);G_car(right?32:54,yd,G_CC[k+3],true)}}
+K.push({id:'dagen-h',batch:'G',title:'SWEDEN SWITCHES SIDES',topic:'History',tags:'sweden dagen h 1967 driving left right road cars traffic vote',
+ stamp:{b:3,at:2700,text:'KEEP RIGHT',bg:'#1d4ed8',top:'30%'},
+ beats:[
+  {d:3800,t:'Until *1967*, Sweden drove on the *left*. All its neighbours drove on the *right*.'},
+  {d:3800,t:'In *1955*, Swedes voted on switching. More than *80%* said *no*.'},
+  {d:3600,t:'Parliament switched anyway. The big day: *3* *September* *1967*.'},
+  {d:4000,t:'Before dawn, every car *stopped*, then carefully crossed to the *right*.'},
+  {d:4200,t:'At *5am* they drove off. Crashes actually *fell* for a while.'}],
+ quiz:{q:'How did most Swedes vote in 1955?',c:'Keep driving on the left',w:'Switch to the right',ex:'Over 80% voted to stay on the left, but Parliament made the switch anyway in 1967.'},
+ draw(b,lt,t){
+  if(b===0){bg('G_road');G_traffic(t,false);if(lt<1800)board(14,88,68,12,'SWEDEN: LEFT','#fde68a');else{board(2,88,92,12,'NEIGHBOURS: RIGHT','#93c5fd');hit('n','beep')}
+   if(BL(400)){poly([36,40,40,32,44,40],'#f8fafc');poly([52,60,56,68,60,60],'#f8fafc')}if(a.every(700,'e')>=0)a.sfx('step')}
+  if(b===1){R(0,0,VW,VH,'#e2e8f0');R(0,84,VW,20,'#94a3b8');ctext('1955 VOTE',4,'#1f2937');
+   R(36,62,24,22,'#1e3a8a');R(36,62,24,2,'#3b82f6');R(42,63,12,1,'#111');for(let k=0;k<3;k++){const p=((t/900)+k/3)%1;R(44+k*2,lerp(40,62,p),6,4,'#f8fafc')}if(a.every(300,'v')>=0)a.sfx('tick');
+   text('NO',4,18,'#1f2937');R(16,17,Math.round(lerp(0,66,P(lt,300,2600))),7,'#dc2626');text('YES',4,30,'#1f2937');R(16,29,Math.round(lerp(0,13,P(lt,300,2600))),7,'#16a34a');
+   if(lt>2600){board(4,88,88,12,'OVER 80% SAID NO','#fca5a5');hit('r','stamp')}}
+  if(b===2){R(0,0,VW,VH,'#bfdbfe');R(0,80,VW,24,'#9ca3af');poly([4,30,26,18,48,30],'#e7e5e4');R(4,30,44,4,'#d6d3d1');for(let i=0;i<5;i++)R(7+i*9,34,4,40,'#f5f5f4');R(4,74,44,6,'#d6d3d1');
+   const sw=lt<1300?Math.abs(Math.sin(lt/150)):0;line(20,58,20+Math.round(sw*10),46,'#78350f',2);R(14+Math.round(sw*10),42,12,5,'#78350f');if(lt<1300&&a.every(300,'gv')>=0)a.sfx('thud');
+   if(lt>1400){hit('c','pop');G_cal(56,30,'SUNDAY','3','SEP 1967','#1d4ed8');R(64,6,20,16,'#1d4ed8');R(64,6,20,1,'#f8fafc');text('H',71,9,'#f8fafc',2)}}
+  if(b===3){bg('G_road');const p=ease(P(lt,800,2700));[[20,false],[64,false]].forEach(([y],k)=>G_car(lerp(32,54,p),y,G_CC[k],false));[[40,true],[84,true]].forEach(([y],k)=>G_car(lerp(54,32,p),y,G_CC[k+3],true));
+   board(30,2,36,14,'4:50','#fde68a');if(lt>800)hit('h','horn');if(lt>2700)hit('d','right')}
+  if(b===4){bg('G_road');G_traffic(t,true);board(30,2,36,14,'5:00','#4ade80');
+   if(lt>1500){R(1,46,26,32,'#111827');text('CRASH',2,48,'#fca5a5');const p=P(lt,1500,3200);for(let i=0;i<22*p;i++){const x=3+i,y=Math.round(58+Math.min(i,12)*1.2-Math.max(0,i-14)*0.6);R(x,y,1,1,'#fca5a5')}hit('g','beep')}
+   if(a.every(700,'e')>=0)a.sfx('step')}
+ }});
+
+/* ---------------- 7. TWO METRES OF DNA ---------------- */
+function G_helix(x0,x1,cy,amp,ph){for(let x=x0;x<x1;x++){const s=Math.sin(x/4+ph),c2=Math.sin(x/4+ph+Math.PI);R(x,cy+s*amp,1,2,'#38bdf8');R(x,cy+c2*amp,1,2,'#f472b6');
+ if(x%3===0){const y0=Math.min(cy+s*amp,cy+c2*amp),y1=Math.max(cy+s*amp,cy+c2*amp);R(x,y0+2,1,Math.max(0,y1-y0-2),['#facc15','#4ade80','#fb923c','#a78bfa'][(x/3)%4])}}}
+K.push({id:'dna-two-metres',batch:'G',title:'TWO METRES OF DNA',topic:'Science',tags:'dna cells body biology genes nucleus genome science letters',
+ beats:[
+  {d:3800,t:'Almost every cell in your body holds a full copy of your *DNA*.'},
+  {d:3800,t:'Stretched out, the DNA in *one* cell would be about *2* *metres* long.'},
+  {d:3800,t:'Yet it fits in a nucleus a few *thousandths* of a *millimetre* across.'},
+  {d:4000,t:'The trick? It wraps around protein *spools*, then coils again and again.'},
+  {d:4400,t:'One copy has about *3* *billion* letters. Typing one a second: nearly *100* *years*.'}],
+ quiz:{q:'Stretched out, how long is the DNA in one cell?',c:'About 2 metres',w:'About 2 millimetres',ex:'Each cell packs about 2 metres of DNA into a nucleus far too small to see, by winding it onto protein spools.'},
+ draw(b,lt,t){R(0,0,VW,VH,'#0f172a');
+  if(b===0){G_big('stand','plain',4,26,5);const z=P(lt,400,1200);line(26,40,48,40,'#e5e7eb');
+   disc(70,44,Math.round(lerp(2,24,z)),'#e5e7eb');disc(70,44,Math.round(lerp(1,22,z)),'#1e293b');
+   if(z>=1){[[62,36],[78,38],[66,52],[80,52],[71,44]].forEach(([x,y],i)=>{disc(x,y,5,'#fda4af');disc(x,y,2,BL(300+i*40)?'#a855f7':'#7e22ce')});hit('z','pop');text('CELLS',60,72,'#fda4af')}
+   if(lt>2000&&BL(250))ctext('DNA IN EACH',88,'#c4b5fd')}
+  if(b===1){const L=Math.round(84*ease(P(lt,200,2600)));G_helix(6,6+L,40,6,t/200);if(lt<2600&&a.every(120,'u')>=0)a.sfx('tick');
+   if(lt>2600){R(6,62,84,1,'#e5e7eb');R(6,59,1,7,'#e5e7eb');R(89,59,1,7,'#e5e7eb');ctext('2 METRES',72,'#fde68a',2);hit('m','ping')}}
+  if(b===2){if(lt<1400){const L=Math.round(84*(1-P(lt,0,1200)));G_helix(48-L/2,48+L/2,40,Math.max(1,6*(1-P(lt,0,1200))),t/200);if(a.once('sh'))a.sfx('rewind')}
+   else{const r=Math.round(lerp(1,26,ease(P(lt,1400,2200))));disc(48,42,r+8,'#fda4af');disc(48,42,r,'#7e22ce');
+    for(let k=0;k<40;k++){const an=k*2.4+t/600,rr=(k%9)/9*(r-2);R(48+Math.cos(an)*rr,42+Math.sin(an)*rr,1,1,k%2?'#38bdf8':'#f472b6')}
+    if(lt>2200){ctext('NUCLEUS',80,'#e5e7eb');ctext('ABOUT 0.006 MM',90,'#fde68a');hit('n','pop')}}}
+  if(b===3){const sp=Math.round(P(lt,0,2400)*5);ctext('SPOOLS',4,'#e5e7eb');
+   for(let i=0;i<5;i++){const x=12+i*18,y=36;if(i<sp){disc(x,y,6,'#a78bfa');disc(x-1,y-1,3,'#c4b5fd');for(let k=0;k<10;k++){const an=k/10*Math.PI*2+t/300;R(x+Math.cos(an)*7,y+Math.sin(an)*7,1,1,'#38bdf8')}hit('s'+i,'pop')}
+    if(i+1<sp)line(x+7,y,x+11,y+Math.round(Math.sin(t/200+i)*2),'#38bdf8')}
+   if(lt>2400){const g=ease(P(lt,2400,3400));const h=Math.round(lerp(4,26,g));line(40,62,56,62+h,'#7e22ce',4);line(56,62,40,62+h,'#7e22ce',4);disc(48,62+h/2,2,'#c4b5fd');ctext('COILED UP',94,'#e5e7eb');hit('x','magic')}}
+  if(b===4){R(6,14,84,14,'#020617');R(6,14,84,1,'#334155');const L='ACGTTGACCGATAGCTTACGGATC';const off=Math.floor(t/90)%L.length;
+   for(let i=0;i<20;i++){const ch=L[(off+i)%L.length];text(ch,8+i*4,18,{A:'#4ade80',C:'#38bdf8',G:'#facc15',T:'#f472b6'}[ch])}
+   R(10,64,76,22,'#334155');for(let j=0;j<3;j++)for(let i=0;i<9;i++){const pr=(Math.floor(t/120)+i*7+j*3)%17===0;R(12+i*8,66+j*7,6,5,pr?'#94a3b8':'#e5e7eb')}if(a.every(120,'ty')>=0)a.sfx('tick');
+   ctext('3 BILLION LETTERS',34,'#e5e7eb');const y=Math.round(lerp(0,95,P(lt,600,3600)));ctext(y+' YEARS',44,'#fde68a',2);if(lt>3600)hit('d','ping')}
+ }});
+
+/* ---------------- 8. RAINBOWS ARE CIRCLES ---------------- */
+BG.G_meadow=(t,o)=>{grad(o.c1||'#64748b',o.c2||'#bfdbfe',0,66);for(let k=0;k<26;k++){const x=(k*37+Math.floor(t/30))%96,y=(k*29+t*0.12)%66;R(x,y,1,3,'rgba(226,232,240,.5)')}
+ R(0,66,VW,38,'#4d7c0f');for(let k=0;k<24;k++)R((k*31)%96,68+(k*7)%34,2,1,'#65a30d')};
+K.push({id:'rainbow-circle',batch:'G',title:'RAINBOWS ARE CIRCLES',topic:'Science',tags:'rainbow light rain colours sun physics weather circle plane optics',
+ beats:[
+  {d:3800,t:'Every rainbow is really a full *circle*. You usually see only the *top*.'},
+  {d:4000,t:'Sunlight enters raindrops, bounces off the back and comes out at about *42°*.'},
+  {d:4000,t:'So the bow is a ring around the point *opposite* the Sun: your *shadow*.'},
+  {d:4000,t:'The *ground* gets in the way. From a *plane*, you can see the whole ring.'},
+  {d:4200,t:'Each person catches light from *different* *drops*. Your rainbow is yours alone.'}],
+ quiz:{q:'Why do we usually see only an arch?',c:'The ground hides the rest',w:'Rainbows are only half circles',ex:'A rainbow is a ring around the point opposite the Sun. From the ground, the lower half is hidden.'},
+ draw(b,lt,t){
+  if(b===0){bg('G_meadow');const rv=P(lt,1500,2500);G_rb(48,66,36,(x,y)=>y<66?P(lt,0,900)*1.4-(y-30)/60:rv*.55);
+   if(rv>0){for(let x=14;x<84;x+=6)R(x,66,3,1,'#f8fafc');hit('r','magic')}if(lt>2500&&BL(300))ctext('FULL CIRCLE',4,'#fde68a')}
+  if(b===1){R(0,0,VW,VH,'#0f172a');disc(48,54,24,'#60a5fa');disc(48,54,23,'#1e3a8a');poly([36,36,48,18,60,36],'#1e3a8a');line(48,19,37,35,'#60a5fa');line(48,19,59,35,'#60a5fa');
+   disc(6,10,4,'#fde047');text('SUN',2,18,'#fde047');
+   const p=P(lt,200,2600),A=[4,40],B=[30,42],C=[68,62],D=[34,74],E=[4,98];
+   const seg=(s,e,q)=>line(s[0],s[1],lerp(s[0],e[0],q),lerp(s[1],e[1],q),'#f8fafc');seg(A,B,p*4);if(p>.25)seg(B,C,(p-.25)*4);if(p>.5)seg(C,D,(p-.5)*4);
+   if(p>.75){const q=(p-.75)*4;for(let i=0;i<7;i++)line(D[0],D[1],lerp(D[0],E[0]+i*3-6,q),lerp(D[1],E[1]-i*2,q),G_RBC[i])}
+   if(lt>200&&lt<2600&&a.every(200,'ry')>=0)a.sfx('beep');
+   if(lt>2600){G_text('42°',56,84,'#fde68a',2);hit('a','ping')}}
+  if(b===2){bg('G_meadow',{c1:'#3b82f6',c2:'#bfdbfe'});disc(8,12,5,'#fde047');
+   const g=P(lt,1600,2600);G_rb(60,82,34,(x,y)=>y<66?g:g*.15);
+   const lp=P(lt,200,1400);for(let i=0;i<30*lp;i+=2){const x=lerp(8,60,i/30),y=lerp(12,82,i/30);R(x,y,1,1,'#fde68a')}
+   poly([30,66,40,66,62,80,58,82],'rgba(15,23,42,.55)');G_big('stand','plain',24,46,2);
+   if(lt>1400){disc(60,81,2,BL(250)?'#fde68a':'#f97316');text('SHADOW',40,90,'#f8fafc');hit('s','pop')}if(lt>1600)hit('rb','magic')}
+  if(b===3){grad('#1d4ed8','#93c5fd',0,56);disc(10,10,5,'#fde047');R(0,56,VW,48,'#f1f5f9');for(let k=0;k<8;k++){const x=((k*19-t*0.02)%120+120)%120-12;disc(x,58+(k%3)*12,6,'#e2e8f0')}
+   G_rb(48,80,22,()=>P(lt,300,1500));R(46,78,5,2,'#94a3b8');R(48,76,1,6,'#94a3b8');
+   const px=Math.round(lerp(30,40,lt/4000));R(px,26,14,3,'#f8fafc');R(px+4,22,4,10,'#e5e7eb');R(px,24,2,3,'#cbd5e1');R(px+12,27,3,1,'#93c5fd');if(a.once('pl'))a.sfx('ship');
+   if(lt>1500){ctext('FROM A PLANE',4,'#f8fafc');hit('m','magic')}}
+  if(b===4){bg('G_meadow',{c1:'#475569',c2:'#cbd5e1'});G_rb(48,100,42,(x,y)=>y<66?.7:0);
+   G_big('stand','plain',18,46,2);G_big('stand','red',62,46,2,true);text('YOU',20,90,'#fde68a');text('FRIEND',58,90,'#fca5a5');
+   const ph=Math.floor(t/700)%3;for(let k=0;k<3;k++){const dA=[14+k*8+ph*2,26+k*5],dB=[60+k*8-ph*2,24+k*6];disc(dA[0],dA[1],1,'#fde68a');disc(dB[0],dB[1],1,'#fca5a5');line(dA[0],dA[1],24,48,'rgba(253,230,138,.6)');line(dB[0],dB[1],70,48,'rgba(252,165,165,.6)')}
+   if(a.every(700,'dp')>=0)a.sfx('drip')}
+ }});
+
+/* ---------------- 9. THE FOSBURY FLOP ---------------- */
+BG.G_stad=(t,o)=>{grad('#38bdf8','#e0f2fe',0,30);crowdRow(t,22,14);R(0,36,VW,10,'#b45309');R(0,46,VW,58,'#16a34a');for(let x=0;x<VW;x+=12)R(x,46,6,58,'#15803d');
+ if(o.sand){R(58,74,34,10,'#e9d29a');R(58,74,34,1,'#fef3c7')}else{R(58,70,34,14,'#2563eb');R(58,70,34,2,'#60a5fa');R(58,82,34,2,'#1e3a8a')}
+ R(54,44,2,40,'#e5e7eb');R(46,o.bar||54,18,2,BL(400)?'#facc15':'#f59e0b')};
+/* jumper in the air: mode flop (back to the bar, arched) or straddle (face down) */
+function G_air(cx,cy,mode,L){const s=L.s,tp=L.t,lg=L.l,h=L.h,k=1.6,X=v=>Math.round(cx+v*k),Y=v=>Math.round(cy+v*k);
+ if(mode==='flop'){line(X(0),Y(0),X(-6),Y(3),tp,3);line(X(0),Y(0),X(6),Y(3),lg,3);line(X(6),Y(3),X(9),Y(7),lg,3);disc(X(-8),Y(4),3,s);R(X(-8)-3,Y(4)+1,6,3,h);R(X(-8),Y(4)-2,1,1,'#111')}
+ else{line(X(-6),Y(0),X(1),Y(0),tp,3);line(X(1),Y(0),X(8),Y(-4),lg,3);line(X(1),Y(1),X(7),Y(3),lg,3);disc(X(-8),Y(0)+1,3,s);R(X(-8)-2,Y(0)-2,4,2,h)}}
+function G_jumpAt(lt,s,e,mode,look,bar){const L=LOOKS[look],q=P(lt,s,e);
+ if(lt<s){const x=Math.round(lerp(-12,36,P(lt,s-1600,s)));G_big('run',look,x,64,2);return 0}
+ if(q<1){const cx=lerp(44,72,q),cy=lerp(62,72,q)-Math.sin(q*Math.PI)*((bar||54)-38+12);G_air(Math.round(cx),Math.round(cy),mode,L);return q}
+ sprF(PS.lie,L,62,72,2);return 1}
+K.push({id:'fosbury-flop',batch:'G',title:'THE FOSBURY FLOP',topic:'Sport',tags:'high jump fosbury flop olympics 1968 mexico athletics backwards',
+ stamp:{b:3,at:2700,text:'GOLD',bg:'#ca8a04'},
+ beats:[
+  {d:4000,t:'For decades, high jumpers went over the bar *face* *down* or *feet* *first*.'},
+  {d:3800,t:'Then a young American, *Dick* *Fosbury*, tried going over *backwards*.'},
+  {d:3600,t:'It looked odd. Then came the *1968* *Olympics* in *Mexico* *City*.'},
+  {d:4000,t:'He cleared *2.24* *metres* and won the *gold* *medal*.'},
+  {d:4200,t:'Today almost every top high jumper uses his *Fosbury* *Flop*.'}],
+ quiz:{q:'How did Dick Fosbury go over the bar?',c:'Backwards, head first',w:'Feet first, facing the bar',ex:'Fosbury went over head first on his back. He won Olympic gold in 1968 and the style took over.'},
+ draw(b,lt,t){
+  if(b===0){bg('G_stad',{sand:true});if(lt<2000){const q=G_jumpAt(lt,1000,1900,'straddle','G_old');if(q>0&&q<1)text('FACE DOWN',2,4,'#1f2937')}
+   else{const q=P(lt,2900,3700);if(lt<2900)G_big('run','G_old',Math.round(lerp(-12,36,P(lt,2000,2900))),64,2);else if(q<1)G_big('kick','G_old',Math.round(lerp(40,64,q)),Math.round(62-Math.sin(q*Math.PI)*22),2);else G_big('stand','G_old',66,62,2);
+    if(lt>2900)text('FEET FIRST',2,4,'#1f2937')}
+   if(lt>1000)hit('j1','swing');if(lt>2900)hit('j2','swing');if(lt>1900)hit('l1','thud');if(lt>3700)hit('l2','thud');if(lt<2900&&a.every(260,'st')>=0)a.sfx('step')}
+  if(b===1){bg('G_stad');const q=G_jumpAt(lt,2200,3500,'flop','G_jump');if(lt<2200&&a.every(260,'st')>=0)a.sfx('step');if(lt>2200)hit('j','swing');if(q>=1)hit('l','thud');
+   if(q>0&&q<1&&BL(200))ctext('BACKWARDS',4,'#dc2626');if(q>=1)ctext('BACKWARDS',4,'#dc2626');text('FOSBURY',2,90,'#f8fafc')}
+  if(b===2){bg('G_stad');if(lt<1800){for(let k=0;k<4;k++)if(BL(200+k*50))text('HA',6+k*24,12+(k%2)*4,'#dc2626');if(a.every(300,'ha')>=0)a.sfx('squeak')}
+   else{board(4,14,88,12,'MEXICO CITY 1968','#fde68a');hit('h','horn')}G_big('stand','G_jump',16+Math.round(Math.sin(t/300)),64,2)}
+  if(b===3){bg('G_stad',{bar:52});board(68,48,26,11,'2.24 M','#fde68a');const q=G_jumpAt(lt,900,2300,'flop','G_jump',52);if(lt<900&&a.every(260,'st')>=0)a.sfx('step');
+   if(lt>900)hit('j','swing');if(q>=1){hit('w','cheer');if(lt<2800)FL=.6;disc(48,14,7,'#facc15');disc(48,14,5,'#fde047');line(44,4,48,8,'#dc2626',2);line(52,4,48,8,'#dc2626',2);text('1',47,12,'#a16207')}}
+  if(b===4){bg('G_stad');const looks=['G_jump','G_fox','green'],i=Math.floor(lt/1400)%3,s=Math.floor(lt/1400)*1400;
+   const q=G_jumpAt(lt-s+1000,1600,2300,'flop',looks[i]);void q;if(lt-s<200)hit('j'+i,'swing');ctext('FOSBURY FLOP',4,'#1f2937');board(14,90,68,11,'JUMPER '+(Math.floor(lt/1400)+1),'#fde68a')}
+ }});
+
+/* ---------------- 10. LEICESTER AT 5000-1 ---------------- */
+function G_row(y,pos,name,hl){R(6,y,84,11,hl?'#b91c1c':'#1e293b');text(String(pos),10,y+3,'#f8fafc');if(name)text(name,26,y+3,'#f8fafc');else R(26,y+5,40,1,'#475569')}
+K.push({id:'leicester-5000-1',batch:'G',title:'LEICESTER AT 5000-1',topic:'Sport',tags:'leicester city football premier league 2016 champions odds betting vardy ranieri',
+ stamp:{b:3,at:1800,text:'CHAMPIONS',bg:'#1d4ed8'},
+ beats:[
+  {d:3600,t:'Spring *2015*. Leicester City are *bottom* of the Premier League.'},
+  {d:4000,t:'They just escape *relegation*. Bookmakers make them *5000-1* to win the next title.'},
+  {d:3800,t:'Then they keep winning. *Jamie* *Vardy* scores in *11* games in a row.'},
+  {d:3800,t:'May *2016*. Leicester are *champions*, *10* *points* clear.'},
+  {d:4200,t:'At 5000-1, a *£10* bet would have won *£50,000*.'}],
+ quiz:{q:'What odds did bookmakers give Leicester?',c:'5000-1',w:'50-1',ex:'Bookmakers rated Leicester 5000-1 for the 2015-16 title. They won it by 10 points.'},
+ draw(b,lt,t){
+  if(b===0){R(0,0,VW,VH,'#0f172a');ctext('APRIL 2015',4,'#e5e7eb');for(let i=0;i<5;i++){const s=200+i*300;if(lt<s)continue;const x=Math.round(M(100,0,lt,s,s+300));o.save();o.translate(x,0);G_row(16+i*15,16+i,i===4?'LEICESTER':'',i===4&&BL(300));o.restore();hit('r'+i,'tick')}
+   if(lt>2000){ctext('BOTTOM',94,'#fca5a5');if(BL(250)){R(46,88,4,3,'#fca5a5')}hit('b','wrong')}}
+  if(b===1){R(0,0,VW,VH,'#0f172a');if(lt<1600){const y=Math.round(M(76,16,lt,100,800));G_row(y,lt<450?20:14,'LEICESTER',false);if(lt>800){ctext('SAFE',40,'#4ade80',2);hit('s','right')}}
+   else{R(6,8,84,72,'#5b3a1e');R(9,11,78,66,'#14532d');ctext('TITLE ODDS',16,'#f8fafc');const s='LEICESTER',n=Math.floor(P(lt,1700,2400)*9);text(s.slice(0,n),14,32,'#f8fafc');
+    if(lt>2500){ctext('5000-1',48,'#fde68a',2);hit('o','stamp')}if(lt<2500&&a.every(90,'ch')>=0)a.sfx('tick')}}
+  if(b===2){bg('pitch');const cyc=320,k=Math.floor(lt/cyc),p=(lt%cyc)/cyc,n=Math.min(11,1+Math.floor(P(lt,0,3400)*11));
+   G_big(p<.3?'kick':'stand','G_fox',44,52,2);disc(lerp(62,90,p),lerp(70,62,p),2,'#f8fafc');if(p>.8)R(88,52,8,26,'rgba(255,255,255,.3)');
+   if(a.every(cyc,'gl')>=0&&lt<3400)a.sfx(k%2?'pop':'bounce');board(10,86,76,12,'GAMES IN A ROW '+n,'#fde68a');if(lt>3400)hit('c','cheer')}
+  if(b===3){R(0,0,VW,VH,'#0f172a');for(let k=0;k<3;k++)poly([12+k*36,0,6+k*36,0,24+k*24,90,36+k*24,90],'rgba(253,230,138,.07)');
+   G_big('cheer','G_fox',10,60,2);G_big('cheer','G_fox2',70,60,2,true,100);G_big('cheer','G_fox',40,62,2,false,200);
+   const ty=Math.round(M(60,26,lt,200,1200));R(43,ty,10,8,'#facc15');R(45,ty+8,6,4,'#eab308');R(41,ty+1,2,4,'#facc15');R(53,ty+1,2,4,'#facc15');R(44,ty+12,8,2,'#a16207');
+   if(lt>1200){confetti();hit('c','cheer')}board(6,4,84,12,'1 LEICESTER +10','#fde68a')}
+  if(b===4){R(0,0,VW,VH,'#14532d');R(16,8,64,80,'#f8fafc');R(16,8,64,8,'#1d4ed8');text('BET SLIP',32,10,'#f8fafc');
+   G_text('STAKE',20,22,'#475569');G_text('£10',56,22,'#111827');G_text('ODDS',20,34,'#475569');G_text('5000-1',52,34,'#111827');R(20,44,56,1,'#cbd5e1');
+   G_text('WON',20,50,'#475569');const v=Math.round(50000*ease(P(lt,600,2800)));const s='£'+v.toLocaleString('en-GB');G_text(s,Math.round((VW-tw(s,2))/2),60,'#15803d',2);
+   if(lt>600&&lt<2800&&a.every(100,'ct')>=0)a.sfx('tick');if(lt>2800){hit('w','right');for(let k=0;k<8;k++){const p=((t/1200)+k/8)%1;disc((k*13+6)%96,p*VH,2,'#facc15')}}}
+ }});
+
 /* ---------- build the feed ---------- */
 Object.assign(MARATHON,{id:'marathon-1904',topic:'Sport',tags:'history olympics running marathon athletics 1904 cheating'});
 Object.assign(DANCE,{id:'dancing-plague',topic:'History',tags:'dance music medieval france strasbourg 1518 disease'});
