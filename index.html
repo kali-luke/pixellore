@@ -13,6 +13,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Pixelify+Sans:wght@500;700&family=Press+Start+2P&display=swap">
 <style>
+@font-face{font-family:PxNum;src:url(https://fonts.gstatic.com/s/silkscreen/v6/m8JXjfVPf62XiF7kO-i9YLNlaw.woff2) format("woff2");unicode-range:U+35,U+43;font-weight:100 599;size-adjust:96%;font-display:swap}
+@font-face{font-family:PxNum;src:url(https://fonts.gstatic.com/s/silkscreen/v6/m8JUjfVPf62XiF7kO-i9aAhAfmyi2A.woff2) format("woff2");unicode-range:U+35,U+43;font-weight:600 900;size-adjust:96%;font-display:swap}
+body{font-variant-ligatures:none;font-feature-settings:"liga" 0,"clig" 0}
 /* A swipe deck of five animated cards. Each card loops until you swipe. Captions use Inter, the same font as the app. */
 :root{
   --navy:#0B1021; --gold:#FBBF24; --cyan:#5FE3F0; --ink:#F4F6FF; --quiet:#AEB9DD; --red:#E5484D; --green:#34D399;
@@ -100,7 +103,7 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .frame .snd.over[aria-pressed="false"]{color:#fff;background:rgba(5,8,20,.75);border-color:rgba(255,255,255,.55)}
 .qgoal{float:right;color:var(--quiet)}.qgoal.done{color:var(--gold)}
 .title{font-family:var(--ui)!important;font-weight:800!important;font-size:clamp(21px,5.8vw,25px)!important;line-height:1.2!important;letter-spacing:-.01em!important;text-wrap:balance}
-body.pixel .title{font-family:"Pixelify Sans",var(--ui)!important;letter-spacing:.01em!important}
+body.pixel .title{font-family:PxNum,"Pixelify Sans",var(--ui)!important;letter-spacing:.01em!important}
 .show{min-height:56px;border-radius:12px;border:3px solid #fde68a;background:var(--gold);color:#1b1203;font-family:var(--px);font-size:13px;box-shadow:4px 4px 0 #7a5208;cursor:pointer}
 .results{flex:0 0 auto!important}
 .slabel{font-family:var(--px);font-size:10px;color:var(--quiet);margin-top:6px}
@@ -140,7 +143,7 @@ body.pixel .title{font-family:"Pixelify Sans",var(--ui)!important;letter-spacing
 .qm.on{background:var(--gold)!important;color:#1b1203!important}
 .count:empty{display:none}
 .sbar{flex:1;min-width:0;min-height:40px;text-align:left;padding:0 12px;border-radius:8px;border:2px solid var(--cyan);background:#0f1736;color:#7d89b5;font-family:var(--ui);font-size:16px;cursor:text}
-.title{font-family:"Pixelify Sans",var(--px)!important;font-weight:700;font-size:clamp(20px,6vw,24px)!important;line-height:1.15!important;letter-spacing:.01em}
+.title{font-family:PxNum,"Pixelify Sans",var(--px)!important;font-weight:700;font-size:clamp(20px,6vw,24px)!important;line-height:1.15!important;letter-spacing:.01em}
 .card.qz .cap{overflow:hidden!important}
 @media (max-height:700px){.card.qz .scene{height:22%}.qq{font-size:18px}.ans{min-height:46px;font-size:16px;padding:6px 12px}.fb{font-size:15px}.quiz{gap:8px}}
 .card[hidden]{display:none}
@@ -167,11 +170,11 @@ body.pixel .title{font-family:"Pixelify Sans",var(--ui)!important;letter-spacing
 .none{font-size:18px;line-height:1.45;color:var(--quiet);margin:0}
 .fontrow{display:flex;align-items:center;gap:8px;font-family:var(--px);font-size:9px;color:var(--quiet)}
 .fontrow span{margin-right:auto}
-body.pixel .line,body.pixel .qq,body.pixel .ans,body.pixel .fb,body.pixel .res{font-family:"Pixelify Sans",var(--ui);letter-spacing:0}
+body.pixel .line,body.pixel .qq,body.pixel .ans,body.pixel .fb,body.pixel .res{font-family:PxNum,"Pixelify Sans",var(--ui);letter-spacing:0}
 body.pixel .line{font-weight:700}
 .card .title{font-family:var(--ui)!important;font-weight:800!important;font-size:clamp(21px,5.8vw,25px)!important;line-height:1.2!important;letter-spacing:-.01em!important}
-body.pixel .card .title{font-family:"Pixelify Sans",var(--ui)!important;letter-spacing:.01em!important}
-body.pixel .veil p,body.pixel .sbar span,body.pixel #q{font-family:"Pixelify Sans",var(--ui)}
+body.pixel .card .title{font-family:PxNum,"Pixelify Sans",var(--ui)!important;letter-spacing:.01em!important}
+body.pixel .veil p,body.pixel .sbar span,body.pixel #q{font-family:PxNum,"Pixelify Sans",var(--ui)}
 body.pixel .line{font-weight:700}
 body.pixel .qq{font-size:22px;font-weight:700}
 body.pixel .ans{font-size:19px;font-weight:700}
@@ -183,22 +186,22 @@ body.pixel .sbar span,body.pixel #q{font-size:17px}
 .arrive{animation:arrive .35s steps(5)}
 @keyframes arrive{0%{transform:scale(.9);filter:brightness(1.8)}100%{transform:scale(1);filter:none}}
 #done .sheet-in{justify-content:center;text-align:center;gap:16px;min-height:100%}
-.dnbig{font-family:"Pixelify Sans",var(--ui);font-size:40px;font-weight:700;line-height:1.1;color:var(--gold);margin:0}
-.dnline{font-family:"Pixelify Sans",var(--ui);font-size:21px;font-weight:700;line-height:1.35;color:#fff;margin:0}
-.dnsmall{font-family:"Pixelify Sans",var(--ui);font-size:19px;line-height:1.4;color:#c9d2f5;margin:0}
+.dnbig{font-family:PxNum,"Pixelify Sans",var(--ui);font-size:40px;font-weight:700;line-height:1.1;color:var(--gold);margin:0}
+.dnline{font-family:PxNum,"Pixelify Sans",var(--ui);font-size:21px;font-weight:700;line-height:1.35;color:#fff;margin:0}
+.dnsmall{font-family:PxNum,"Pixelify Sans",var(--ui);font-size:19px;line-height:1.4;color:#c9d2f5;margin:0}
 #done .tool{min-height:56px;font-size:12px}
 #dnkeep{border-color:var(--gold);color:var(--gold)}
 #stats .sheet-in{gap:12px;overflow-y:auto}
 .sthead{display:flex;justify-content:space-between;align-items:center;font-family:var(--px);font-size:13px;color:var(--gold)}
 .stgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stbox{background:#121a3d;border:2px solid #2a3570;border-radius:10px;padding:12px 12px 10px;color:var(--ink)}
-.stbox b{display:block;font-family:"Pixelify Sans",var(--ui);font-size:36px;line-height:1;color:#fff}
-.stbox span{display:block;margin-top:6px;font-family:"Pixelify Sans",var(--ui);font-size:16px;font-weight:700;color:#c9d2f5}
+.stbox b{display:block;font-family:PxNum,"Pixelify Sans",var(--ui);font-size:36px;line-height:1;color:#fff}
+.stbox span{display:block;margin-top:6px;font-family:PxNum,"Pixelify Sans",var(--ui);font-size:16px;font-weight:700;color:#c9d2f5}
 .stbox.wide{grid-column:1/-1}
 .week{display:flex;gap:6px;margin-top:8px}
-.week i{flex:1;text-align:center;font-style:normal;font-family:"Pixelify Sans",var(--ui);font-size:15px;font-weight:700;padding:8px 0;border-radius:8px;border:2px solid #2a3570;color:#7d89b5}
+.week i{flex:1;text-align:center;font-style:normal;font-family:PxNum,"Pixelify Sans",var(--ui);font-size:15px;font-weight:700;padding:8px 0;border-radius:8px;border:2px solid #2a3570;color:#7d89b5}
 .week i.on{background:var(--gold);border-color:var(--gold);color:#10142b}
-.stnote{font-family:"Pixelify Sans",var(--ui);font-size:16px;color:#c9d2f5;margin:0;line-height:1.4}
+.stnote{font-family:PxNum,"Pixelify Sans",var(--ui);font-size:16px;color:#c9d2f5;margin:0;line-height:1.4}
 </style>
 
 <main class="deck" id="deck"></main>
@@ -249,7 +252,7 @@ function disc(cx,cy,r,c){for(let dy=-r;dy<=r;dy++){const w=Math.floor(Math.sqrt(
 function poly(p,c){let a=1e9,b=-1e9;for(let i=1;i<p.length;i+=2){a=Math.min(a,p[i]);b=Math.max(b,p[i])}const n=p.length/2;
  for(let y=Math.floor(a);y<=Math.ceil(b);y++){const yc=y+.5,xs=[];for(let i=0;i<n;i++){const x1=p[2*i],y1=p[2*i+1],x2=p[(2*i+2)%p.length],y2=p[(2*i+3)%p.length];if((y1<=yc&&y2>yc)||(y2<=yc&&y1>yc))xs.push(x1+(yc-y1)/(y2-y1)*(x2-x1))}
  xs.sort((u,v)=>u-v);for(let k=0;k+1<xs.length;k+=2){const l=Math.round(xs[k]),r=Math.round(xs[k+1]);if(r>l)R(l,y,r-l,1,c)}}}
-const G="+000010111010000=000111000111000#101111101111101%101001010100101>100010001010100A010101111101101B110101110101110C011100100100011D110101101101110E111100110100111F111100110100100G011100101101011H101101111101101I111010010010111J001001001101010K101101110101101L100100100100111M101111111101101N110101101101101O010101101101010P110101110100100Q010101101110011R110101110101101S011100010001110T111010010010010U101101101101111V101101101101010W101101111111101X101101010101101Y101101010010010Z111001010100111"+
+const G="+000010111010000=000111000111000#101111101111101%101001010100101>100010001010100A010101111101101B110101110101110C011100100100011D110101101101110E111100110100111F111100110100100G011100101101011H101101111101101I111010010010111J001001001101010K101101110101101L100100100100111M101111111101101N111101101101101O010101101101010P110101110100100Q010101101110011R110101110101101S011100010001110T111010010010010U101101101101111V101101101101010W101101111111101X101101010101101Y101101010010010Z111001010100111"+
  "0111101101101111101011001001011121100010101001113110001010001110410110111100100151111001100011106011100111101111711100101001001081111011111011119111101111001110 000000000000000.000000000000010?110001010000010!010010010000010:000010000010000-000000111000000/001001010100100<001010100010001";
 const FONT={};for(let i=0;i<G.length;i+=16)FONT[G[i]]=G.slice(i+1,i+16);
 function text(s,x,y,c,k){k=k||1;[...s].forEach((ch,n)=>{const g=FONT[ch];if(!g)return;for(let j=0;j<5;j++)for(let i=0;i<3;i++)if(g[j*3+i]==='1')R(x+(n*4+i)*k,y+j*k,k,k,c)})}
@@ -4237,11 +4240,11 @@ function shareCard(c){const url=location.origin+location.pathname+'#'+encodeURIC
  const text=c.beats[0].t.replace(/\*/g,'');
  if(navigator.share){navigator.share({title:'PixelLore: '+c.title.toLowerCase().replace(/^./,m=>m.toUpperCase()),text,url}).catch(()=>{})}
  else{try{navigator.clipboard.writeText(text+' '+url).then(()=>toast('LINK COPIED','SEND IT TO A FRIEND'),()=>toast('COPY THIS LINK',url))}catch(e){toast('COPY THIS LINK',url)}}}
-function nextText(c){return S.list.indexOf(c)<S.list.length-1?'SWIPE UP FOR THE NEXT ONE':S.label?'LAST ONE ON THIS TOPIC. TAP SEARCH, THEN ALL, FOR EVERYTHING':'THAT IS THE LAST ONE. TAP SEARCH FOR MORE'}
+function nextText(c){return S.list.indexOf(c)<S.list.length-1?(DESK?'PRESS THE DOWN KEY':'SWIPE UP')+' FOR THE NEXT ONE':S.label?'LAST ONE ON THIS TOPIC. TAP SEARCH, THEN ALL, FOR EVERYTHING':'THAT IS THE LAST ONE. TAP SEARCH FOR MORE'}
 function showQuiz(c){
  c.quizShown=true;c.fitUntil=performance.now()+700;c.qm.classList.add('on');c.el.classList.add('qz');markSeen(c);
  const q=c.quiz;if(c.order==null)c.order=Math.random()<.5;const opts=c.order?[q.c,q.w]:[q.w,q.c],ok=c.order?0:1;
- c.cap.innerHTML=`<div class="quiz"><div class="qlabel">QUICK QUESTION <span class="qgoal"></span></div><p class="qq">${q.q}</p>${opts.map((x,i)=>`<button class="ans" data-i="${i}"><b>${'AB'[i]}</b><span>${x}</span></button>`).join('')}<p class="fb"></p><div class="skip">OR SWIPE UP TO SKIP</div></div>`;
+ c.cap.innerHTML=`<div class="quiz"><div class="qlabel">QUICK QUESTION <span class="qgoal"></span></div><p class="qq">${q.q}</p>${opts.map((x,i)=>`<button class="ans" data-i="${i}"><b>${'AB'[i]}</b><span>${x}</span></button>`).join('')}<p class="fb"></p><div class="skip">${DESK?'OR PRESS THE DOWN KEY TO SKIP':'OR SWIPE UP TO SKIP'}</div></div>`;
  drawGoal();
  const all=[...c.cap.querySelectorAll('.ans')],fb=c.cap.querySelector('.fb'),sk=c.cap.querySelector('.skip');
  const settle=(i,fresh)=>{all.forEach(x=>x.disabled=true);all[ok].classList.add('ok');
@@ -4253,7 +4256,7 @@ function showQuiz(c){
  if(c.ans!=null)settle(c.ans,false);
 }
 
-function resetCard(c){c.counted=false;c.fitUntil=performance.now()+700;c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.qm.classList.remove('on');c.el.classList.remove('qz');c.stampEl.classList.remove('on');c.pausedEl.hidden=true;parts=[];FL=0}
+function resetCard(c){c.counted=false;c.postered=true;c.fitUntil=performance.now()+700;c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.qm.classList.remove('on');c.el.classList.remove('qz');c.stampEl.classList.remove('on');c.pausedEl.hidden=true;parts=[];FL=0}
 function activate(i){if(i===S.active)return;if(S.active>=0&&S.started)hideHint();engineOff();const old=CARDS[S.active];if(old){if(S.started)taste(old);resetCard(old);render(old)}S.active=i;const c=CARDS[i];resetCard(c);if(S.started&&searchEl.hidden&&statsEl.hidden&&doneEl.hidden){S.playing=true;arrive(c)}render(c);if(S.started)setTimeout(()=>reorder(c),400)}
 /* every card announces itself: a short topic tune and a pop of the frame, so nothing loads silent or still */
 const TUNE={History:[392,523],Science:[659,880],Space:[523,1047],Sport:[440,659],Animals:[587,784],Tech:[880,1175],Mind:[494,740]};
@@ -4279,7 +4282,11 @@ function loop(now){const dt=Math.min(64,now-last);last=now;const c=CARDS[S.activ
  requestAnimationFrame(loop)}
 
 /* posters for cards not on screen yet */
-CARDS.forEach(c=>{c.T=Math.min(1600,c.total-1);render(c);resetCard(c);caption(c,c.beats[0].t)});
+function poster(c){if(c.postered)return;c.postered=true;if(c===CARDS[S.active])return;c.T=Math.min(1600,c.total-1);render(c);resetCard(c);caption(c,c.beats[0].t)}
+CARDS.forEach(c=>caption(c,c.beats[0].t));
+/* draw each card's still picture only when it comes near the screen, so the page opens fast */
+const pio=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)poster(CARDS[+e.target.dataset.i])})},{root:deck,rootMargin:'200% 0px'});
+CARDS.forEach(c=>pio.observe(c.el));
 
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>=.6)activate(+e.target.dataset.i)})},{root:deck,threshold:[.6]});
 CARDS.forEach(c=>io.observe(c.el));
@@ -4299,6 +4306,12 @@ qEl.addEventListener('input',showResults);
 qEl.addEventListener('keydown',e=>{if(e.key==='Enter'){const m=matches(qEl.value.trim());if(m.length){setFilter(m,qEl.value.trim().toUpperCase());closeSearch()}}});
 document.getElementById('sclose').addEventListener('click',closeSearch);
 document.getElementById('topics').addEventListener('click',e=>{const t=e.target.closest('.topic');if(!t)return;const v=t.dataset.t;setFilter(v==='All'?CARDS.slice():CARDS.filter(c=>c.topic===v),v==='All'?'':v.toUpperCase());closeSearch()});
+/* computers: arrow keys, space and page keys move between stories */
+const DESK=matchMedia('(hover:hover) and (pointer:fine)').matches;
+function step(d){const list=domList(S.list),i=list.indexOf(CARDS[S.active]),n=list[i+d];if(n)n.el.scrollIntoView({behavior:RM?'auto':'smooth'})}
+document.addEventListener('keydown',e=>{if(!S.started||!searchEl.hidden||!statsEl.hidden||!doneEl.hidden||e.target.tagName==='INPUT')return;
+ if(['ArrowDown','PageDown',' ','j'].includes(e.key)){e.preventDefault();step(1)}else if(['ArrowUp','PageUp','k'].includes(e.key)){e.preventDefault();step(-1)}});
+if(DESK){document.getElementById('hint').textContent='SCROLL OR PRESS THE DOWN KEY FOR THE NEXT STORY';document.querySelectorAll('.veil .small').forEach(e=>e.innerHTML='SCROLL OR PRESS THE DOWN KEY FOR THE NEXT ONE<br>SOUND ON IS BEST')}
 /* ---------- done for today ---------- */
 const doneEl=document.getElementById('done');
 function showDone(){const s=streak(),t=LOG[dkey()]||{},left=CARDS.filter(c=>!SEEN.includes(c.id)).length;
