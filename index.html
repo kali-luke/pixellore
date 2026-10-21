@@ -177,6 +177,20 @@ body.pixel .qq{font-size:22px;font-weight:700}
 body.pixel .ans{font-size:19px;font-weight:700}
 body.pixel .fb{font-size:18px}
 body.pixel .sbar span,body.pixel #q{font-size:17px}
+.statrow{display:flex;gap:8px}
+.statrow .tool{flex:1;min-height:52px;font-size:11px;border-color:var(--gold);color:var(--gold)}
+#stats{background:#0a0f24}
+#stats .sheet-in{gap:12px;overflow-y:auto}
+.sthead{display:flex;justify-content:space-between;align-items:center;font-family:var(--px);font-size:13px;color:var(--gold)}
+.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stbox{background:#121a3d;border:2px solid #2a3570;border-radius:10px;padding:12px 12px 10px;color:var(--ink)}
+.stbox b{display:block;font-family:"Pixelify Sans",var(--ui);font-size:36px;line-height:1;color:#fff}
+.stbox span{display:block;margin-top:6px;font-family:"Pixelify Sans",var(--ui);font-size:16px;font-weight:700;color:#c9d2f5}
+.stbox.wide{grid-column:1/-1}
+.week{display:flex;gap:6px;margin-top:8px}
+.week i{flex:1;text-align:center;font-style:normal;font-family:"Pixelify Sans",var(--ui);font-size:15px;font-weight:700;padding:8px 0;border-radius:8px;border:2px solid #2a3570;color:#7d89b5}
+.week i.on{background:var(--gold);border-color:var(--gold);color:#10142b}
+.stnote{font-family:"Pixelify Sans",var(--ui);font-size:16px;color:#c9d2f5;margin:0;line-height:1.4}
 </style>
 
 <main class="deck" id="deck"></main>
@@ -186,7 +200,14 @@ body.pixel .sbar span,body.pixel #q{font-size:17px}
   <div class="results" id="results"></div>
   <div class="slabel">OR PICK A TOPIC</div>
   <div class="topics" id="topics"></div>
+  <div class="statrow"><button class="tool" id="sopen">MY STATS</button></div>
   <div class="fontrow"><span>TEXT STYLE</span><button class="tool fon" id="fpixel" aria-pressed="true">PIXEL</button><button class="tool fon" id="fclean" aria-pressed="false">CLEAN</button></div>
+ </div>
+</div>
+<div class="sheet" id="stats" hidden role="dialog" aria-label="My stats">
+ <div class="sheet-in">
+  <div class="sthead"><span>MY STATS</span><button class="tool" id="stclose">CLOSE</button></div>
+  <div id="stbody"></div>
  </div>
 </div>
 <div class="hint" id="hint" hidden>SWIPE UP FOR THE NEXT STORY</div>
@@ -3353,6 +3374,8 @@ const GOAL=5,DKEY='pixellore-reel-days';let DAYS={};try{DAYS=JSON.parse(localSto
 function dkey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function today(){return DAYS[dkey()]||0}
 function streak(){let n=0;const d=new Date();if(today()<GOAL)d.setDate(d.getDate()-1);while((DAYS[dkey(d)]||0)>=GOAL){n++;d.setDate(d.getDate()-1)}return n}
+const LKEY='pixellore-reel-log';let LOG={};try{LOG=JSON.parse(localStorage.getItem(LKEY)||'{}')||{}}catch(e){LOG={}}
+function logAdd(f,n){const k=dkey();const d=LOG[k]||(LOG[k]={v:0,c:0,r:0});d[f]=(d[f]||0)+(n||1);if(!LOG.first)LOG.first=k;try{localStorage.setItem(LKEY,JSON.stringify(LOG))}catch(e){}}
 function markSeen(c){if(SEEN.includes(c.id))return;SEEN.push(c.id);try{localStorage.setItem(SKEY,JSON.stringify(SEEN))}catch(e){}}
 /* feed order: every topic spread evenly through the reel, so the first 15 cards show a bit of everything */
 const CARDS=(()=>{const pool=PICKS.concat(K.filter(c=>!PICKS.includes(c))),by={},order=[];
@@ -3415,7 +3438,7 @@ function goalText(){const n=today();return n>=GOAL?'GOAL DONE':n+'/'+GOAL+' TODA
 function drawGoal(){document.querySelectorAll('.qgoal').forEach(e=>{const n=today();e.textContent=n>=GOAL?'GOAL DONE TODAY':n+' OF '+GOAL+' TODAY';e.classList.toggle('done',n>=GOAL)});const n=today(),done=n>=GOAL,h=done?'<b>GOAL</b> DONE':'<b>'+n+'/'+GOAL+'</b> TODAY';CARDS.forEach(c=>{if(c.goalEl.innerHTML!==h)c.goalEl.innerHTML=h;c.goalEl.classList.toggle('done',done)})}
 let toastT=0;
 function toast(big,small){const el=document.getElementById('toast');el.querySelector('b').textContent=big;el.querySelector('span').textContent=small;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2800)}
-function answered(){const k=dkey();DAYS[k]=(DAYS[k]||0)+1;try{localStorage.setItem(DKEY,JSON.stringify(DAYS))}catch(e){}drawGoal();
+function answered(){logAdd('a');const k=dkey();DAYS[k]=(DAYS[k]||0)+1;try{localStorage.setItem(DKEY,JSON.stringify(DAYS))}catch(e){}drawGoal();
  if(DAYS[k]===GOAL){const s=streak();if(!muted)SFX.magic&&SFX.magic();toast('DAILY GOAL DONE',s>1?s+' DAYS IN A ROW':'COME BACK TOMORROW FOR DAY 2')}}
 function shareCard(c){const url=location.origin+location.pathname+'#'+encodeURIComponent(c.id);
  const text=c.beats[0].t.replace(/\*/g,'');
@@ -3429,7 +3452,7 @@ function showQuiz(c){
  drawGoal();
  const all=[...c.cap.querySelectorAll('.ans')],fb=c.cap.querySelector('.fb'),sk=c.cap.querySelector('.skip');
  const settle=(i,fresh)=>{all.forEach(x=>x.disabled=true);all[ok].classList.add('ok');
-  if(i===ok){if(fresh&&!muted)SFX.right();fb.className='fb good';fb.innerHTML=`<span class="xp">NICE ONE</span><br>${q.ex}`}
+  if(i===ok){if(fresh){logAdd('r');if(!muted)SFX.right()}fb.className='fb good';fb.innerHTML=`<span class="xp">NICE ONE</span><br>${q.ex}`}
   else{all[i].classList.add('bad');if(fresh&&!muted)SFX.wrong();fb.className='fb badc';fb.textContent='Not this time. '+q.ex}
   sk.className='next';sk.textContent=nextText(c);
   if(SHARE_OK&&!c.cap.querySelector('.share')){const sb=document.createElement('button');sb.className='share';sb.textContent='SHARE THIS CARD';sb.addEventListener('click',()=>shareCard(c));sk.before(sb)}};
@@ -3437,12 +3460,12 @@ function showQuiz(c){
  if(c.ans!=null)settle(c.ans,false);
 }
 
-function resetCard(c){c.fitUntil=performance.now()+700;c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.qm.classList.remove('on');c.el.classList.remove('qz');c.stampEl.classList.remove('on');c.pausedEl.hidden=true;parts=[];FL=0}
-function activate(i){if(i===S.active)return;if(S.active>=0&&S.started)hideHint();engineOff();const old=CARDS[S.active];if(old){resetCard(old);render(old)}S.active=i;const c=CARDS[i];resetCard(c);if(S.started&&searchEl.hidden)S.playing=true;render(c)}
+function resetCard(c){c.counted=false;c.fitUntil=performance.now()+700;c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.qm.classList.remove('on');c.el.classList.remove('qz');c.stampEl.classList.remove('on');c.pausedEl.hidden=true;parts=[];FL=0}
+function activate(i){if(i===S.active)return;if(S.active>=0&&S.started)hideHint();engineOff();const old=CARDS[S.active];if(old){resetCard(old);render(old)}S.active=i;const c=CARDS[i];resetCard(c);if(S.started&&searchEl.hidden&&statsEl.hidden)S.playing=true;render(c)}
 
 let last=0;
 function loop(now){const dt=Math.min(64,now-last);last=now;const c=CARDS[S.active];
- if(c){if(S.playing){c.T+=dt;if(c.T>=c.total){c.T=0;c.loop++;c.ev={};c.ticks={};engineOff();c.beat=-1;if(!c.quizShown)showQuiz(c)}}render(c)}
+ if(c){if(S.playing){c.T+=dt;if(!c.counted&&c.T>=5000){c.counted=true;logAdd('c')}if(c.T>=c.total){c.T=0;c.loop++;c.ev={};c.ticks={};engineOff();c.beat=-1;if(!c.quizShown)showQuiz(c)}}render(c)}
  requestAnimationFrame(loop)}
 
 /* posters for cards not on screen yet */
@@ -3466,6 +3489,29 @@ qEl.addEventListener('input',showResults);
 qEl.addEventListener('keydown',e=>{if(e.key==='Enter'){const m=matches(qEl.value.trim());if(m.length){setFilter(m,qEl.value.trim().toUpperCase());closeSearch()}}});
 document.getElementById('sclose').addEventListener('click',closeSearch);
 document.getElementById('topics').addEventListener('click',e=>{const t=e.target.closest('.topic');if(!t)return;const v=t.dataset.t;setFilter(v==='All'?CARDS.slice():CARDS.filter(c=>c.topic===v),v==='All'?'':v.toUpperCase());closeSearch()});
+/* ---------- my stats ---------- */
+const statsEl=document.getElementById('stats');
+function dayInfo(k){const d=LOG[k]||{};return{v:d.v||0,c:d.c||0,a:DAYS[k]||0,r:d.r||0}}
+function showStats(){const keys=new Set([...Object.keys(LOG).filter(k=>k!=='first'),...Object.keys(DAYS)]);
+ let first=LOG.first;keys.forEach(k=>{if(!first||k<first)first=k});
+ const vis=[...keys].filter(k=>{const d=dayInfo(k);return d.v||d.c||d.a});
+ let tc=0,la=0,tr=0;keys.forEach(k=>{const d=dayInfo(k);tc+=d.c;tr+=d.r;la+=(LOG[k]&&LOG[k].a)||0});
+ const t=dayInfo(dkey()),s=streak(),seen=SEEN.filter(id=>CARDS.some(c=>c.id===id)).length;
+ const wk=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=dkey(d),x=dayInfo(k);wk.push(`<i class="${x.v||x.c||x.a?'on':''}">${'SMTWTFS'[d.getDay()]}</i>`)}
+ const fd=first?new Date(first+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}).toUpperCase():'TODAY';
+ const box=(n,l,w)=>`<div class="stbox${w?' wide':''}"><b>${n}</b><span>${l}</span></div>`;
+ document.getElementById('stbody').innerHTML=`<div class="stgrid">
+  ${box(t.c,'CARDS TODAY')}${box(t.a+' / '+GOAL,'QUESTIONS TODAY')}
+  ${box(s,s===1?'DAY IN A ROW':'DAYS IN A ROW')}${box(vis.length,vis.length===1?'DAY VISITED':'DAYS VISITED')}
+  <div class="stbox wide"><span style="margin-top:0">LAST 7 DAYS</span><div class="week">${wk.join('')}</div></div>
+  ${box(tc,'CARDS WATCHED')}${box(la?Math.round(100*tr/la)+'%':'-','RIGHT ANSWERS')}
+  ${box(seen+' / '+CARDS.length,'STORIES SEEN')}${box(fd,'FIRST VISIT')}
+ </div><p class="stnote">A card counts once you watch it for 5 seconds. Your stats stay on this phone.</p>`;
+ searchEl.hidden=true;statsEl.hidden=false;S.playing=false;engineOff()}
+function closeStats(){statsEl.hidden=true;closeSearch()}
+document.getElementById('sopen').addEventListener('click',showStats);
+document.getElementById('stclose').addEventListener('click',closeStats);
+window.__stats=()=>({LOG,DAYS});
 /* text style switch, so clean and pixel captions can be compared */
 function setFont(px){document.body.classList.toggle('pixel',px);document.getElementById('fclean').setAttribute('aria-pressed',String(!px));document.getElementById('fpixel').setAttribute('aria-pressed',String(px));try{localStorage.setItem('pixellore-reel-font2',px?'pixel':'clean')}catch(e){}}
 document.getElementById('fclean').addEventListener('click',()=>setFont(false));
@@ -3474,7 +3520,7 @@ try{setFont(localStorage.getItem('pixellore-reel-font2')!=='clean')}catch(e){set
 
 setFilter(CARDS.slice(),'');drawGoal();setSound();
 function hideHint(){const h=document.getElementById('hint');if(!h.hidden){h.classList.add('gone');setTimeout(()=>h.hidden=true,500);try{localStorage.setItem('pixellore-reel-hinted','1')}catch(e){}}}
-function begin(){if(S.started)return;try{if(!localStorage.getItem('pixellore-reel-hinted'))document.getElementById('hint').hidden=false}catch(e){}A();if(ac&&ac.state!=='running')ac.resume();document.getElementById('start').hidden=true;S.started=true;S.playing=true;const c=CARDS[S.active];resetCard(c)}
+function begin(){if(S.started)return;try{if(!localStorage.getItem('pixellore-reel-hinted'))document.getElementById('hint').hidden=false}catch(e){}A();if(ac&&ac.state!=='running')ac.resume();document.getElementById('start').hidden=true;logAdd('v');S.started=true;S.playing=true;const c=CARDS[S.active];resetCard(c)}
 const st0=document.getElementById('start');st0.addEventListener('click',begin);st0.addEventListener('touchend',e=>{e.preventDefault();begin()});
 if(SEEN.length){const left=CARDS.length-SEEN.filter(id=>CARDS.some(c=>c.id===id)).length;document.getElementById('hook').textContent=left>0?'Welcome back. '+left+' cards you have not seen yet.':'Welcome back. You have seen every card. New ones are coming.';document.getElementById('play').textContent='TAP TO CARRY ON'}
 {const s=streak(),n=today(),h=document.getElementById('hook');if(s>0)h.textContent=n>=GOAL?(s>1?'Goal done today. '+s+' days in a row.':'Goal done today. Come back tomorrow for day 2.'):'Day '+(s+1)+' is waiting. '+s+(s===1?' day':' days')+' in a row so far.';else if(!SEEN.length)h.textContent='Short true stories, 20 seconds each. Answer '+GOAL+' questions a day to start a streak.'}
