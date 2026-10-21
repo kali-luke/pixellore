@@ -93,6 +93,19 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 @media (prefers-reduced-motion:reduce){.line .w{animation:none;opacity:1;transform:none}.shake,.next{animation:none}.stamp.on{transition:none}}
 
 /* reel additions */
+.meta .count,.meta .goal{display:none!important}
+.sbar{flex:1}
+.sbar.on{color:var(--ink)!important;border-color:var(--cyan)!important}
+.frame .snd.over{position:absolute;top:12px;right:12px;z-index:2;width:40px;height:40px;min-width:40px!important;border-radius:8px;border:2px solid rgba(255,255,255,.35);background:rgba(5,8,20,.55);color:#fff}
+.frame .snd.over[aria-pressed="false"]{color:#fff;background:rgba(5,8,20,.75);border-color:rgba(255,255,255,.55)}
+.qgoal{float:right;color:var(--quiet)}.qgoal.done{color:var(--gold)}
+.title{font-family:var(--ui)!important;font-weight:800!important;font-size:clamp(21px,5.8vw,25px)!important;line-height:1.2!important;letter-spacing:-.01em!important;text-wrap:balance}
+body.pixel .title{font-family:"Pixelify Sans",var(--ui)!important;letter-spacing:.01em!important}
+.show{min-height:56px;border-radius:12px;border:3px solid #fde68a;background:var(--gold);color:#1b1203;font-family:var(--px);font-size:13px;box-shadow:4px 4px 0 #7a5208;cursor:pointer}
+.results{flex:0 0 auto!important}
+.slabel{font-family:var(--px);font-size:10px;color:var(--quiet);margin-top:6px}
+.topics .tool{min-height:52px!important;font-size:11px!important;padding:0 16px!important}
+.fontrow{margin-top:auto}
 /* header: status is flat, actions look like controls */
 .stage{gap:0!important}
 .meta{gap:10px!important;min-height:44px}
@@ -156,14 +169,17 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .fontrow span{margin-right:auto}
 body.pixel .line,body.pixel .qq,body.pixel .ans,body.pixel .fb,body.pixel .res{font-family:"Pixelify Sans",var(--ui);letter-spacing:0}
 body.pixel .line{font-weight:700}
+.card .title{font-family:var(--ui)!important;font-weight:800!important;font-size:clamp(21px,5.8vw,25px)!important;line-height:1.2!important;letter-spacing:-.01em!important}
+body.pixel .card .title{font-family:"Pixelify Sans",var(--ui)!important;letter-spacing:.01em!important}
 </style>
 
 <main class="deck" id="deck"></main>
 <div class="sheet" id="search" hidden role="dialog" aria-label="Search">
  <div class="sheet-in">
   <div class="srow"><input id="q" type="search" placeholder="Search a topic" autocomplete="off" aria-label="Search facts"><button class="tool" id="sclose">CLOSE</button></div>
-  <div class="topics" id="topics"></div>
   <div class="results" id="results"></div>
+  <div class="slabel">OR PICK A TOPIC</div>
+  <div class="topics" id="topics"></div>
   <div class="fontrow"><span>TEXT STYLE</span><button class="tool fon" id="fclean" aria-pressed="true">CLEAN</button><button class="tool fon" id="fpixel" aria-pressed="false">PIXEL</button></div>
  </div>
 </div>
@@ -3359,14 +3375,14 @@ CARDS.forEach((c,i)=>{
  c.hay=(c.title+' '+c.topic+' '+c.tags+' '+c.beats.map(x=>x.t).join(' ')).toLowerCase().replace(/[*.,'?!]/g,' ');
  const s=document.createElement('section');s.className='card';s.dataset.i=i;
  s.innerHTML=`<div class="stage">
-  <div class="meta"><span class="count"></span><span class="goal"></span><button class="sbar srch" aria-label="Search"><svg viewBox="0 0 13 13" width="20" height="20" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor"><rect x="3" y="1" width="4" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="4"/><rect x="8" y="3" width="1" height="4"/><rect x="2" y="7" width="1" height="1"/><rect x="7" y="7" width="1" height="1"/><rect x="3" y="8" width="4" height="1"/><rect x="8" y="8" width="2" height="2"/><rect x="10" y="10" width="2" height="2"/></svg><span>Search</span></button><button class="snd ico" aria-pressed="true" aria-label="Sound on"></button></div>
+  <div class="meta"><span class="count"></span><span class="goal" hidden></span><button class="sbar srch" aria-label="Search"><svg viewBox="0 0 13 13" width="20" height="20" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor"><rect x="3" y="1" width="4" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="4"/><rect x="8" y="3" width="1" height="4"/><rect x="2" y="7" width="1" height="1"/><rect x="7" y="7" width="1" height="1"/><rect x="3" y="8" width="4" height="1"/><rect x="8" y="8" width="2" height="2"/><rect x="10" y="10" width="2" height="2"/></svg><span>Search</span></button></div>
   <h2 class="title">${c.title}</h2>
-  <div class="scene"><div class="shot"><div class="frame"><canvas width="${VW}" height="${VH}" role="img" aria-label="Animated pixel scene: ${c.title.toLowerCase()}"></canvas></div><div class="stamp" style="--sb:${c.stamp.bg};--st:${c.stamp.top||'44%'}">${c.stamp.text}</div><div class="paused" hidden>PAUSED</div><div class="bars" aria-label="Progress. Tap to jump to the question">${c.beats.map(()=>'<div class="bar"><i></i></div>').join('')}<span class="qm">?</span></div></div></div>
+  <div class="scene"><div class="shot"><div class="frame"><button class="snd ico over" aria-pressed="true" aria-label="Sound on"></button><canvas width="${VW}" height="${VH}" role="img" aria-label="Animated pixel scene: ${c.title.toLowerCase()}"></canvas></div><div class="stamp" style="--sb:${c.stamp.bg};--st:${c.stamp.top||'44%'}">${c.stamp.text}</div><div class="paused" hidden>PAUSED</div><div class="bars" aria-label="Progress. Tap to jump to the question">${c.beats.map(()=>'<div class="bar"><i></i></div>').join('')}<span class="qm">?</span></div></div></div>
   <div class="cap" aria-live="polite"><p class="line"></p></div></div>`;
  deck.appendChild(s);
  c.el=s;c.cv=s.querySelector('canvas');c.ctx=c.cv.getContext('2d');c.cap=s.querySelector('.cap');c.bars=[...s.querySelectorAll('.bar i')];c.qm=s.querySelector('.qm');c.stampEl=s.querySelector('.stamp');c.frame=s.querySelector('.frame');c.pausedEl=s.querySelector('.paused');c.countEl=s.querySelector('.count');c.goalEl=s.querySelector('.goal');
  s.querySelector('.scene').addEventListener('click',()=>{if(S.active!==i||!S.started)return;S.playing=!S.playing;c.pausedEl.hidden=S.playing;if(!S.playing)engineOff()});
- s.querySelector('.snd').addEventListener('click',()=>{muted=!muted;if(muted)engineOff();setSound()});
+ s.querySelector('.snd').addEventListener('click',e=>{e.stopPropagation();muted=!muted;if(muted)engineOff();setSound()});
  s.querySelector('.srch').addEventListener('click',openSearch);
  s.querySelector('.bars').addEventListener('click',e=>{e.stopPropagation();if(S.active===i&&S.started&&!c.quizShown)showQuiz(c)});
  c.countEl.addEventListener('click',()=>{if(S.label)setFilter(CARDS.slice(),'',c)});
@@ -3390,7 +3406,7 @@ function render(c){
 }
 
 function goalText(){const n=today();return n>=GOAL?'GOAL DONE':n+'/'+GOAL+' TODAY'}
-function drawGoal(){const n=today(),done=n>=GOAL,h=done?'<b>GOAL</b> DONE':'<b>'+n+'/'+GOAL+'</b> TODAY';CARDS.forEach(c=>{if(c.goalEl.innerHTML!==h)c.goalEl.innerHTML=h;c.goalEl.classList.toggle('done',done)})}
+function drawGoal(){document.querySelectorAll('.qgoal').forEach(e=>{const n=today();e.textContent=n>=GOAL?'GOAL DONE TODAY':n+' OF '+GOAL+' TODAY';e.classList.toggle('done',n>=GOAL)});const n=today(),done=n>=GOAL,h=done?'<b>GOAL</b> DONE':'<b>'+n+'/'+GOAL+'</b> TODAY';CARDS.forEach(c=>{if(c.goalEl.innerHTML!==h)c.goalEl.innerHTML=h;c.goalEl.classList.toggle('done',done)})}
 let toastT=0;
 function toast(big,small){const el=document.getElementById('toast');el.querySelector('b').textContent=big;el.querySelector('span').textContent=small;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2800)}
 function answered(){const k=dkey();DAYS[k]=(DAYS[k]||0)+1;try{localStorage.setItem(DKEY,JSON.stringify(DAYS))}catch(e){}drawGoal();
@@ -3399,11 +3415,12 @@ function shareCard(c){const url=location.origin+location.pathname+'#'+encodeURIC
  const text=c.beats[0].t.replace(/\*/g,'');
  if(navigator.share){navigator.share({title:'PixelLore: '+c.title.toLowerCase().replace(/^./,m=>m.toUpperCase()),text,url}).catch(()=>{})}
  else{try{navigator.clipboard.writeText(text+' '+url).then(()=>toast('LINK COPIED','SEND IT TO A FRIEND'),()=>toast('COPY THIS LINK',url))}catch(e){toast('COPY THIS LINK',url)}}}
-function nextText(c){return S.list.indexOf(c)<S.list.length-1?'SWIPE UP FOR THE NEXT ONE':S.label?'LAST ONE ON THIS TOPIC. TAP THE X AT THE TOP FOR ALL CARDS':'THAT IS THE LAST ONE. TAP SEARCH FOR MORE'}
+function nextText(c){return S.list.indexOf(c)<S.list.length-1?'SWIPE UP FOR THE NEXT ONE':S.label?'LAST ONE ON THIS TOPIC. TAP SEARCH, THEN ALL, FOR EVERYTHING':'THAT IS THE LAST ONE. TAP SEARCH FOR MORE'}
 function showQuiz(c){
  c.quizShown=true;c.fitUntil=performance.now()+700;c.qm.classList.add('on');c.el.classList.add('qz');markSeen(c);
  const q=c.quiz;if(c.order==null)c.order=Math.random()<.5;const opts=c.order?[q.c,q.w]:[q.w,q.c],ok=c.order?0:1;
- c.cap.innerHTML=`<div class="quiz"><div class="qlabel">QUICK QUESTION</div><p class="qq">${q.q}</p>${opts.map((x,i)=>`<button class="ans" data-i="${i}"><b>${'AB'[i]}</b><span>${x}</span></button>`).join('')}<p class="fb"></p><div class="skip">OR SWIPE UP TO SKIP</div></div>`;
+ c.cap.innerHTML=`<div class="quiz"><div class="qlabel">QUICK QUESTION <span class="qgoal"></span></div><p class="qq">${q.q}</p>${opts.map((x,i)=>`<button class="ans" data-i="${i}"><b>${'AB'[i]}</b><span>${x}</span></button>`).join('')}<p class="fb"></p><div class="skip">OR SWIPE UP TO SKIP</div></div>`;
+ drawGoal();
  const all=[...c.cap.querySelectorAll('.ans')],fb=c.cap.querySelector('.fb'),sk=c.cap.querySelector('.skip');
  const settle=(i,fresh)=>{all.forEach(x=>x.disabled=true);all[ok].classList.add('ok');
   if(i===ok){if(fresh&&!muted)SFX.right();fb.className='fb good';fb.innerHTML=`<span class="xp">NICE ONE</span><br>${q.ex}`}
@@ -3432,10 +3449,10 @@ CARDS.forEach(c=>io.observe(c.el));
 const searchEl=document.getElementById('search'),qEl=document.getElementById('q'),resEl=document.getElementById('results');
 document.getElementById('topics').innerHTML=['All',...TOPICS].map(t=>`<button class="tool topic" data-t="${t}">${t.toUpperCase()}</button>`).join('');
 function matches(q){const toks=q.toLowerCase().split(/\s+/).filter(Boolean);if(!toks.length)return CARDS.slice();return CARDS.filter(c=>toks.every(k=>c.hay.includes(k)))}
-function showResults(){const q=qEl.value.trim(),m=matches(q);
- resEl.innerHTML=m.length?m.map(c=>`<button class="res" data-i="${CARDS.indexOf(c)}"><span>${c.title}</span><small>${c.topic.toUpperCase()}</small></button>`).join(''):`<p class="none">Nothing on "${q.replace(/[<>&"]/g,'')}" yet. Try history, science, space or sport.</p>`;
- resEl.querySelectorAll('.res').forEach(btn=>btn.addEventListener('click',()=>{setFilter(CARDS.slice(),'',CARDS[+btn.dataset.i]);closeSearch()}))}
-function setFilter(list,label,start){S.list=list;S.label=label;CARDS.forEach(c=>{c.el.hidden=!list.includes(c)});list.forEach((c,i)=>{c.countEl.textContent=label?(i+1)+'/'+list.length+'  '+label+'  X':'';c.countEl.classList.toggle('clr',!!label)});
+function showResults(){const q=qEl.value.trim();if(!q){resEl.innerHTML='';return}const m=matches(q),safe=q.replace(/[<>&"]/g,'');
+ resEl.innerHTML=m.length?`<button class="show">SHOW ${m.length} ${m.length===1?'STORY':'STORIES'}</button>`:`<p class="none">Nothing on "${safe}" yet. Try a topic below.</p>`;
+ const b=resEl.querySelector('.show');if(b)b.addEventListener('click',()=>{setFilter(m,safe.toUpperCase());closeSearch()})}
+function setFilter(list,label,start){S.list=list;S.label=label;document.querySelectorAll('.sbar span').forEach(e=>{e.textContent=label?label.charAt(0)+label.slice(1).toLowerCase()+'  (tap to change)':'Search'});document.querySelectorAll('.sbar').forEach(e=>e.classList.toggle('on',!!label));CARDS.forEach(c=>{c.el.hidden=!list.includes(c)});list.forEach((c,i)=>{c.countEl.textContent=label?(i+1)+'/'+list.length+'  '+label+'  X':'';c.countEl.classList.toggle('clr',!!label)});
  const tgt=start||list[0];S.active=-1;tgt.el.scrollIntoView();activate(CARDS.indexOf(tgt));list.forEach(c=>{const n=c.cap.querySelector('.next');if(n)n.textContent=nextText(c)})}
 function openSearch(){searchEl.hidden=false;S.playing=false;engineOff();qEl.value='';showResults();try{qEl.focus()}catch(e){}}
 function closeSearch(){searchEl.hidden=true;if(S.started){S.playing=true;const c=CARDS[S.active];if(c)c.pausedEl.hidden=true}}
