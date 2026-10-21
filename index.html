@@ -93,6 +93,32 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 @media (prefers-reduced-motion:reduce){.line .w{animation:none;opacity:1;transform:none}.shake,.next{animation:none}.stamp.on{transition:none}}
 
 /* reel additions */
+/* header: status is flat, actions look like controls */
+.stage{gap:0!important}
+.meta{gap:10px!important;min-height:44px}
+.goal{border:none!important;background:rgba(255,255,255,.06)!important;color:var(--quiet)!important;padding:8px 10px!important;border-radius:999px!important;cursor:default}
+.goal b{color:var(--gold);font-weight:400}
+.goal.done{background:rgba(251,191,36,.14)!important;color:var(--gold)!important}
+.sbar{display:flex;align-items:center;gap:8px;background:rgba(10,15,36,.85)!important;border:2px solid #2a3566!important;color:#8a96c4!important;min-height:44px}
+.sbar svg{flex:none;color:var(--cyan)}
+.sbar:focus-visible,.sbar:active{border-color:var(--cyan)!important}
+.snd.ico{flex:none;width:44px;height:44px;min-width:44px!important;padding:0!important;display:grid;place-items:center;border-radius:10px;border:2px solid #3a4690;background:#1a2147;color:var(--ink)}
+.snd.ico[aria-pressed="false"]{color:var(--quiet);border-color:#2a3566;background:transparent}
+.title{margin-top:16px!important}
+.scene{margin-top:12px}
+.shot .bars{align-items:center}
+.cap{padding-top:16px!important}
+/* quiz: keep the title, shrink the picture less */
+.card.qz .scene{height:38%}
+@media (max-height:760px){.card.qz .title{display:block!important}.card.qz .scene{height:30%}}
+@media (max-height:640px){.card.qz .scene{height:24%}}
+/* answers feel pressable */
+.ans{box-shadow:0 3px 0 #0a1330;transition:transform .08s,box-shadow .08s}
+.ans:not(:disabled):active{transform:translateY(2px) scale(.98);box-shadow:0 1px 0 #0a1330}
+.ans.bad{border-color:#f0857a!important;background:#3a1d22!important}.ans.bad b{background:#f0857a!important;color:#2a0d10!important}
+/* first-visit hint */
+.hint{position:fixed;left:0;right:0;bottom:max(22px,env(safe-area-inset-bottom,0px));z-index:6;text-align:center;font-family:var(--px);font-size:10px;color:var(--quiet);pointer-events:none;animation:bob 1.4s ease-in-out infinite;transition:opacity .4s}
+.hint[hidden]{display:none}.hint.gone{opacity:0}
 .card{content-visibility:auto;contain-intrinsic-size:auto 100vh;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .shot{position:relative;display:flex;flex-direction:column;gap:8px}
 .shot .bars{height:20px;gap:5px}
@@ -141,6 +167,7 @@ body.pixel .line{font-weight:700}
   <div class="fontrow"><span>TEXT STYLE</span><button class="tool fon" id="fclean" aria-pressed="true">CLEAN</button><button class="tool fon" id="fpixel" aria-pressed="false">PIXEL</button></div>
  </div>
 </div>
+<div class="hint" id="hint" hidden>SWIPE UP FOR THE NEXT STORY</div>
 <div class="toast" id="toast" aria-live="polite"><b></b><span></span></div>
 <div class="veil" id="start">
   <h1>PIXEL<span>LORE</span></h1>
@@ -3324,14 +3351,15 @@ const ids=new Set();CARDS.forEach(c=>{if(ids.has(c.id))console.error('duplicate 
 const TOPICS=['History','Science','Space','Sport','Animals','Tech','Mind'].filter(t=>CARDS.some(c=>c.topic===t));
 const deck=document.getElementById('deck');
 const S={playing:false,started:false,active:-1,list:CARDS.slice(),label:''};
-function setSound(){document.querySelectorAll('.snd').forEach(b=>{b.setAttribute('aria-pressed',String(!muted));b.textContent=muted?'SOUND OFF':'SOUND ON'})}
+const SPK_ON='<svg viewBox="0 0 12 12" width="22" height="22" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor"><rect x="1" y="4" width="2" height="4"/><rect x="3" y="3" width="1" height="6"/><rect x="4" y="2" width="1" height="8"/><rect x="5" y="1" width="1" height="10"/><rect x="7" y="4" width="1" height="4"/><rect x="9" y="2" width="1" height="8"/></svg>',SPK_OFF='<svg viewBox="0 0 12 12" width="22" height="22" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor"><rect x="1" y="4" width="2" height="4"/><rect x="3" y="3" width="1" height="6"/><rect x="4" y="2" width="1" height="8"/><rect x="5" y="1" width="1" height="10"/><rect x="7" y="4" width="1" height="1"/><rect x="8" y="5" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="10" y="7" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="7" y="7" width="1" height="1"/></svg>';
+function setSound(){document.querySelectorAll('.snd').forEach(b=>{b.setAttribute('aria-pressed',String(!muted));b.setAttribute('aria-label',muted?'Sound off':'Sound on');b.innerHTML=muted?SPK_OFF:SPK_ON})}
 CARDS.forEach((c,i)=>{
  c.start=[];let acc=0;c.beats.forEach(x=>{c.start.push(acc);acc+=x.d});c.total=acc;
  c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.ans=null;c.stamp=c.stamp||{b:-1,at:0,text:'',bg:'#000'};
  c.hay=(c.title+' '+c.topic+' '+c.tags+' '+c.beats.map(x=>x.t).join(' ')).toLowerCase().replace(/[*.,'?!]/g,' ');
  const s=document.createElement('section');s.className='card';s.dataset.i=i;
  s.innerHTML=`<div class="stage">
-  <div class="meta"><span class="count"></span><span class="goal"></span><button class="sbar srch" aria-label="Search">Search</button><button class="tool snd" aria-pressed="true">SOUND ON</button></div>
+  <div class="meta"><span class="count"></span><span class="goal"></span><button class="sbar srch" aria-label="Search"><svg viewBox="0 0 13 13" width="20" height="20" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor"><rect x="3" y="1" width="4" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="4"/><rect x="8" y="3" width="1" height="4"/><rect x="2" y="7" width="1" height="1"/><rect x="7" y="7" width="1" height="1"/><rect x="3" y="8" width="4" height="1"/><rect x="8" y="8" width="2" height="2"/><rect x="10" y="10" width="2" height="2"/></svg><span>Search</span></button><button class="snd ico" aria-pressed="true" aria-label="Sound on"></button></div>
   <h2 class="title">${c.title}</h2>
   <div class="scene"><div class="shot"><div class="frame"><canvas width="${VW}" height="${VH}" role="img" aria-label="Animated pixel scene: ${c.title.toLowerCase()}"></canvas></div><div class="stamp" style="--sb:${c.stamp.bg};--st:${c.stamp.top||'44%'}">${c.stamp.text}</div><div class="paused" hidden>PAUSED</div><div class="bars" aria-label="Progress. Tap to jump to the question">${c.beats.map(()=>'<div class="bar"><i></i></div>').join('')}<span class="qm">?</span></div></div></div>
   <div class="cap" aria-live="polite"><p class="line"></p></div></div>`;
@@ -3362,7 +3390,7 @@ function render(c){
 }
 
 function goalText(){const n=today();return n>=GOAL?'GOAL DONE':n+'/'+GOAL+' TODAY'}
-function drawGoal(){const txt=goalText(),done=today()>=GOAL;CARDS.forEach(c=>{if(c.goalEl.textContent!==txt)c.goalEl.textContent=txt;c.goalEl.classList.toggle('done',done)})}
+function drawGoal(){const n=today(),done=n>=GOAL,h=done?'<b>GOAL</b> DONE':'<b>'+n+'/'+GOAL+'</b> TODAY';CARDS.forEach(c=>{if(c.goalEl.innerHTML!==h)c.goalEl.innerHTML=h;c.goalEl.classList.toggle('done',done)})}
 let toastT=0;
 function toast(big,small){const el=document.getElementById('toast');el.querySelector('b').textContent=big;el.querySelector('span').textContent=small;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2800)}
 function answered(){const k=dkey();DAYS[k]=(DAYS[k]||0)+1;try{localStorage.setItem(DKEY,JSON.stringify(DAYS))}catch(e){}drawGoal();
@@ -3387,7 +3415,7 @@ function showQuiz(c){
 }
 
 function resetCard(c){c.fitUntil=performance.now()+700;c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.qm.classList.remove('on');c.el.classList.remove('qz');c.stampEl.classList.remove('on');c.pausedEl.hidden=true;parts=[];FL=0}
-function activate(i){if(i===S.active)return;engineOff();const old=CARDS[S.active];if(old){resetCard(old);render(old)}S.active=i;const c=CARDS[i];resetCard(c);if(S.started&&searchEl.hidden)S.playing=true;render(c)}
+function activate(i){if(i===S.active)return;if(S.active>=0&&S.started)hideHint();engineOff();const old=CARDS[S.active];if(old){resetCard(old);render(old)}S.active=i;const c=CARDS[i];resetCard(c);if(S.started&&searchEl.hidden)S.playing=true;render(c)}
 
 let last=0;
 function loop(now){const dt=Math.min(64,now-last);last=now;const c=CARDS[S.active];
@@ -3421,8 +3449,9 @@ document.getElementById('fclean').addEventListener('click',()=>setFont(false));
 document.getElementById('fpixel').addEventListener('click',()=>setFont(true));
 try{setFont(localStorage.getItem('pixellore-reel-font')==='pixel')}catch(e){setFont(false)}
 
-setFilter(CARDS.slice(),'');drawGoal();
-function begin(){if(S.started)return;A();if(ac&&ac.state!=='running')ac.resume();document.getElementById('start').hidden=true;S.started=true;S.playing=true;const c=CARDS[S.active];resetCard(c)}
+setFilter(CARDS.slice(),'');drawGoal();setSound();
+function hideHint(){const h=document.getElementById('hint');if(!h.hidden){h.classList.add('gone');setTimeout(()=>h.hidden=true,500);try{localStorage.setItem('pixellore-reel-hinted','1')}catch(e){}}}
+function begin(){if(S.started)return;try{if(!localStorage.getItem('pixellore-reel-hinted'))document.getElementById('hint').hidden=false}catch(e){}A();if(ac&&ac.state!=='running')ac.resume();document.getElementById('start').hidden=true;S.started=true;S.playing=true;const c=CARDS[S.active];resetCard(c)}
 const st0=document.getElementById('start');st0.addEventListener('click',begin);st0.addEventListener('touchend',e=>{e.preventDefault();begin()});
 if(SEEN.length){const left=CARDS.length-SEEN.filter(id=>CARDS.some(c=>c.id===id)).length;document.getElementById('hook').textContent=left>0?'Welcome back. '+left+' cards you have not seen yet.':'Welcome back. You have seen every card. New ones are coming.';document.getElementById('play').textContent='TAP TO CARRY ON'}
 {const s=streak(),n=today(),h=document.getElementById('hook');if(s>0)h.textContent=n>=GOAL?(s>1?'Goal done today. '+s+' days in a row.':'Goal done today. Come back tomorrow for day 2.'):'Day '+(s+1)+' is waiting. '+s+(s===1?' day':' days')+' in a row so far.';else if(!SEEN.length)h.textContent='Short true stories, 20 seconds each. Answer '+GOAL+' questions a day to start a streak.'}
