@@ -171,6 +171,12 @@ body.pixel .line,body.pixel .qq,body.pixel .ans,body.pixel .fb,body.pixel .res{f
 body.pixel .line{font-weight:700}
 .card .title{font-family:var(--ui)!important;font-weight:800!important;font-size:clamp(21px,5.8vw,25px)!important;line-height:1.2!important;letter-spacing:-.01em!important}
 body.pixel .card .title{font-family:"Pixelify Sans",var(--ui)!important;letter-spacing:.01em!important}
+body.pixel .veil p,body.pixel .sbar span,body.pixel #q{font-family:"Pixelify Sans",var(--ui)}
+body.pixel .line{font-weight:700}
+body.pixel .qq{font-size:22px;font-weight:700}
+body.pixel .ans{font-size:19px;font-weight:700}
+body.pixel .fb{font-size:18px}
+body.pixel .sbar span,body.pixel #q{font-size:17px}
 </style>
 
 <main class="deck" id="deck"></main>
@@ -180,7 +186,7 @@ body.pixel .card .title{font-family:"Pixelify Sans",var(--ui)!important;letter-s
   <div class="results" id="results"></div>
   <div class="slabel">OR PICK A TOPIC</div>
   <div class="topics" id="topics"></div>
-  <div class="fontrow"><span>TEXT STYLE</span><button class="tool fon" id="fclean" aria-pressed="true">CLEAN</button><button class="tool fon" id="fpixel" aria-pressed="false">PIXEL</button></div>
+  <div class="fontrow"><span>TEXT STYLE</span><button class="tool fon" id="fpixel" aria-pressed="true">PIXEL</button><button class="tool fon" id="fclean" aria-pressed="false">CLEAN</button></div>
  </div>
 </div>
 <div class="hint" id="hint" hidden>SWIPE UP FOR THE NEXT STORY</div>
@@ -3461,10 +3467,10 @@ qEl.addEventListener('keydown',e=>{if(e.key==='Enter'){const m=matches(qEl.value
 document.getElementById('sclose').addEventListener('click',closeSearch);
 document.getElementById('topics').addEventListener('click',e=>{const t=e.target.closest('.topic');if(!t)return;const v=t.dataset.t;setFilter(v==='All'?CARDS.slice():CARDS.filter(c=>c.topic===v),v==='All'?'':v.toUpperCase());closeSearch()});
 /* text style switch, so clean and pixel captions can be compared */
-function setFont(px){document.body.classList.toggle('pixel',px);document.getElementById('fclean').setAttribute('aria-pressed',String(!px));document.getElementById('fpixel').setAttribute('aria-pressed',String(px));try{localStorage.setItem('pixellore-reel-font',px?'pixel':'clean')}catch(e){}}
+function setFont(px){document.body.classList.toggle('pixel',px);document.getElementById('fclean').setAttribute('aria-pressed',String(!px));document.getElementById('fpixel').setAttribute('aria-pressed',String(px));try{localStorage.setItem('pixellore-reel-font2',px?'pixel':'clean')}catch(e){}}
 document.getElementById('fclean').addEventListener('click',()=>setFont(false));
 document.getElementById('fpixel').addEventListener('click',()=>setFont(true));
-try{setFont(localStorage.getItem('pixellore-reel-font')==='pixel')}catch(e){setFont(false)}
+try{setFont(localStorage.getItem('pixellore-reel-font2')!=='clean')}catch(e){setFont(true)}
 
 setFilter(CARDS.slice(),'');drawGoal();setSound();
 function hideHint(){const h=document.getElementById('hint');if(!h.hidden){h.classList.add('gone');setTimeout(()=>h.hidden=true,500);try{localStorage.setItem('pixellore-reel-hinted','1')}catch(e){}}}
