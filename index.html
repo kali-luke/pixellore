@@ -50,7 +50,6 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .paused{position:absolute;left:0;right:0;top:46%;text-align:center;font-family:var(--px);font-size:16px;color:#fff;text-shadow:0 2px 0 #000;pointer-events:none}
 .paused[hidden]{display:none}
 .cap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:12px;padding-top:4px;overflow:hidden}
-.card.qz .cap{overflow-y:auto}
 .line{margin:0;font-size:clamp(25px,7.2vw,32px);line-height:1.2;font-weight:800;letter-spacing:-.02em;text-wrap:balance;text-shadow:0 2px 0 #000,0 0 18px rgba(0,0,0,.6)}
 .line .w{display:inline-block;opacity:0;transform:translateY(.35em) scale(.9);animation:pop .32s cubic-bezier(.2,1.4,.4,1) forwards}
 .line .hi{color:var(--gold)}
@@ -94,6 +93,17 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 @media (prefers-reduced-motion:reduce){.line .w{animation:none;opacity:1;transform:none}.shake,.next{animation:none}.stamp.on{transition:none}}
 
 /* reel additions */
+.card{content-visibility:auto;contain-intrinsic-size:auto 100vh;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.shot{position:relative;display:flex;flex-direction:column;gap:8px}
+.shot .bars{height:20px;gap:5px}
+.shot .bar{height:6px;border-radius:3px}
+.qm{font-size:13px!important;padding:4px 6px!important;border:2px solid var(--gold);background:#1b1203!important;color:var(--gold)!important;border-radius:5px}
+.qm.on{background:var(--gold)!important;color:#1b1203!important}
+.count:empty{display:none}
+.sbar{flex:1;min-width:0;min-height:40px;text-align:left;padding:0 12px;border-radius:8px;border:2px solid var(--cyan);background:#0f1736;color:#7d89b5;font-family:var(--ui);font-size:16px;cursor:text}
+.title{font-family:"Pixelify Sans",var(--px)!important;font-weight:700;font-size:clamp(20px,6vw,24px)!important;line-height:1.15!important;letter-spacing:.01em}
+.card.qz .cap{overflow:hidden!important}
+@media (max-height:700px){.card.qz .scene{height:22%}.qq{font-size:18px}.ans{min-height:46px;font-size:16px;padding:6px 12px}.fb{font-size:15px}.quiz{gap:8px}}
 .card[hidden]{display:none}
 .meta{gap:8px}
 .count{margin-left:0;margin-right:auto;font-size:10px;line-height:1.4}
@@ -3321,17 +3331,16 @@ CARDS.forEach((c,i)=>{
  c.hay=(c.title+' '+c.topic+' '+c.tags+' '+c.beats.map(x=>x.t).join(' ')).toLowerCase().replace(/[*.,'?!]/g,' ');
  const s=document.createElement('section');s.className='card';s.dataset.i=i;
  s.innerHTML=`<div class="stage">
-  <div class="bars" aria-hidden="true">${c.beats.map(()=>'<div class="bar"><i></i></div>').join('')}<span class="qm">?</span></div>
-  <div class="meta"><span class="count"></span><span class="goal"></span><button class="tool srch">SEARCH</button><button class="tool snd" aria-pressed="true">SOUND ON</button></div>
+  <div class="meta"><span class="count"></span><span class="goal"></span><button class="sbar srch" aria-label="Search">Search</button><button class="tool snd" aria-pressed="true">SOUND ON</button></div>
   <h2 class="title">${c.title}</h2>
-  <div class="scene"><div class="frame"><canvas width="${VW}" height="${VH}" role="img" aria-label="Animated pixel scene: ${c.title.toLowerCase()}"></canvas></div><div class="stamp" style="--sb:${c.stamp.bg};--st:${c.stamp.top||'44%'}">${c.stamp.text}</div><div class="paused" hidden>PAUSED</div></div>
+  <div class="scene"><div class="shot"><div class="frame"><canvas width="${VW}" height="${VH}" role="img" aria-label="Animated pixel scene: ${c.title.toLowerCase()}"></canvas></div><div class="stamp" style="--sb:${c.stamp.bg};--st:${c.stamp.top||'44%'}">${c.stamp.text}</div><div class="paused" hidden>PAUSED</div><div class="bars" aria-label="Progress. Tap to jump to the question">${c.beats.map(()=>'<div class="bar"><i></i></div>').join('')}<span class="qm">?</span></div></div></div>
   <div class="cap" aria-live="polite"><p class="line"></p></div></div>`;
  deck.appendChild(s);
  c.el=s;c.cv=s.querySelector('canvas');c.ctx=c.cv.getContext('2d');c.cap=s.querySelector('.cap');c.bars=[...s.querySelectorAll('.bar i')];c.qm=s.querySelector('.qm');c.stampEl=s.querySelector('.stamp');c.frame=s.querySelector('.frame');c.pausedEl=s.querySelector('.paused');c.countEl=s.querySelector('.count');c.goalEl=s.querySelector('.goal');
  s.querySelector('.scene').addEventListener('click',()=>{if(S.active!==i||!S.started)return;S.playing=!S.playing;c.pausedEl.hidden=S.playing;if(!S.playing)engineOff()});
  s.querySelector('.snd').addEventListener('click',()=>{muted=!muted;if(muted)engineOff();setSound()});
  s.querySelector('.srch').addEventListener('click',openSearch);
- s.querySelector('.bars').addEventListener('click',()=>{if(S.active===i&&S.started&&!c.quizShown)showQuiz(c)});
+ s.querySelector('.bars').addEventListener('click',e=>{e.stopPropagation();if(S.active===i&&S.started&&!c.quizShown)showQuiz(c)});
  c.countEl.addEventListener('click',()=>{if(S.label)setFilter(CARDS.slice(),'',c)});
 });
 
@@ -3364,7 +3373,7 @@ function shareCard(c){const url=location.origin+location.pathname+'#'+encodeURIC
  else{try{navigator.clipboard.writeText(text+' '+url).then(()=>toast('LINK COPIED','SEND IT TO A FRIEND'),()=>toast('COPY THIS LINK',url))}catch(e){toast('COPY THIS LINK',url)}}}
 function nextText(c){return S.list.indexOf(c)<S.list.length-1?'SWIPE UP FOR THE NEXT ONE':S.label?'LAST ONE ON THIS TOPIC. TAP THE X AT THE TOP FOR ALL CARDS':'THAT IS THE LAST ONE. TAP SEARCH FOR MORE'}
 function showQuiz(c){
- c.quizShown=true;c.qm.classList.add('on');c.el.classList.add('qz');markSeen(c);
+ c.quizShown=true;c.fitUntil=performance.now()+700;c.qm.classList.add('on');c.el.classList.add('qz');markSeen(c);
  const q=c.quiz;if(c.order==null)c.order=Math.random()<.5;const opts=c.order?[q.c,q.w]:[q.w,q.c],ok=c.order?0:1;
  c.cap.innerHTML=`<div class="quiz"><div class="qlabel">QUICK QUESTION</div><p class="qq">${q.q}</p>${opts.map((x,i)=>`<button class="ans" data-i="${i}"><b>${'AB'[i]}</b><span>${x}</span></button>`).join('')}<p class="fb"></p><div class="skip">OR SWIPE UP TO SKIP</div></div>`;
  const all=[...c.cap.querySelectorAll('.ans')],fb=c.cap.querySelector('.fb'),sk=c.cap.querySelector('.skip');
@@ -3377,12 +3386,12 @@ function showQuiz(c){
  if(c.ans!=null)settle(c.ans,false);
 }
 
-function resetCard(c){c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.qm.classList.remove('on');c.el.classList.remove('qz');c.stampEl.classList.remove('on');c.pausedEl.hidden=true;parts=[];FL=0}
+function resetCard(c){c.fitUntil=performance.now()+700;c.T=0;c.loop=0;c.ev={};c.ticks={};c.beat=-1;c.quizShown=false;c.qm.classList.remove('on');c.el.classList.remove('qz');c.stampEl.classList.remove('on');c.pausedEl.hidden=true;parts=[];FL=0}
 function activate(i){if(i===S.active)return;engineOff();const old=CARDS[S.active];if(old){resetCard(old);render(old)}S.active=i;const c=CARDS[i];resetCard(c);if(S.started&&searchEl.hidden)S.playing=true;render(c)}
 
 let last=0;
 function loop(now){const dt=Math.min(64,now-last);last=now;const c=CARDS[S.active];
- if(c){fit(c);if(S.playing){c.T+=dt;if(c.T>=c.total){c.T=0;c.loop++;c.ev={};c.ticks={};engineOff();c.beat=-1;if(!c.quizShown)showQuiz(c)}}render(c)}
+ if(c){if(S.playing){c.T+=dt;if(c.T>=c.total){c.T=0;c.loop++;c.ev={};c.ticks={};engineOff();c.beat=-1;if(!c.quizShown)showQuiz(c)}}render(c)}
  requestAnimationFrame(loop)}
 
 /* posters for cards not on screen yet */
@@ -3398,9 +3407,9 @@ function matches(q){const toks=q.toLowerCase().split(/\s+/).filter(Boolean);if(!
 function showResults(){const q=qEl.value.trim(),m=matches(q);
  resEl.innerHTML=m.length?m.map(c=>`<button class="res" data-i="${CARDS.indexOf(c)}"><span>${c.title}</span><small>${c.topic.toUpperCase()}</small></button>`).join(''):`<p class="none">Nothing on "${q.replace(/[<>&"]/g,'')}" yet. Try history, science, space or sport.</p>`;
  resEl.querySelectorAll('.res').forEach(btn=>btn.addEventListener('click',()=>{setFilter(CARDS.slice(),'',CARDS[+btn.dataset.i]);closeSearch()}))}
-function setFilter(list,label,start){S.list=list;S.label=label;CARDS.forEach(c=>{c.el.hidden=!list.includes(c)});list.forEach((c,i)=>{c.countEl.textContent=(i+1)+'/'+list.length+(label?'  '+label+'  X':'');c.countEl.classList.toggle('clr',!!label)});
+function setFilter(list,label,start){S.list=list;S.label=label;CARDS.forEach(c=>{c.el.hidden=!list.includes(c)});list.forEach((c,i)=>{c.countEl.textContent=label?(i+1)+'/'+list.length+'  '+label+'  X':'';c.countEl.classList.toggle('clr',!!label)});
  const tgt=start||list[0];S.active=-1;tgt.el.scrollIntoView();activate(CARDS.indexOf(tgt));list.forEach(c=>{const n=c.cap.querySelector('.next');if(n)n.textContent=nextText(c)})}
-function openSearch(){searchEl.hidden=false;S.playing=false;engineOff();qEl.value='';showResults()}
+function openSearch(){searchEl.hidden=false;S.playing=false;engineOff();qEl.value='';showResults();try{qEl.focus()}catch(e){}}
 function closeSearch(){searchEl.hidden=true;if(S.started){S.playing=true;const c=CARDS[S.active];if(c)c.pausedEl.hidden=true}}
 qEl.addEventListener('input',showResults);
 qEl.addEventListener('keydown',e=>{if(e.key==='Enter'){const m=matches(qEl.value.trim());if(m.length){setFilter(m,qEl.value.trim().toUpperCase());closeSearch()}}});
@@ -3422,8 +3431,10 @@ function wake(){if(ac&&ac.state!=='running'&&S.started)ac.resume()}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)wake()});document.addEventListener('pointerdown',wake);
 
 /* sizing: biggest canvas that fits the scene, rechecked every frame so the quiz shrink animates */
-function fit(c){const sc=c.el.querySelector('.scene'),w=sc.clientWidth-18,h=sc.clientHeight-18;if(w<=0||h<=0)return;const k=Math.max(1,Math.min(w/VW,h/VH));const W=Math.floor(VW*k)+'px';if(c.cv.style.width!==W){c.cv.style.width=W;c.cv.style.height=Math.floor(VH*k)+'px'}}
+function fit(c){const sc=c.sceneEl||(c.sceneEl=c.el.querySelector('.scene')),w=sc.clientWidth-18,h=sc.clientHeight-18-28;if(w<=0||h<=0)return;const k=Math.max(1,Math.min(w/VW,h/VH));const W=Math.floor(VW*k)+'px';if(c.cv.style.width!==W){c.cv.style.width=W;c.cv.style.height=Math.floor(VH*k)+'px'}}
 CARDS.forEach(fit);addEventListener('resize',()=>CARDS.forEach(fit));
+if(window.ResizeObserver){const ro=new ResizeObserver(es=>es.forEach(e=>{const c=CARDS[+e.target.closest('.card').dataset.i];if(c)fit(c)}));CARDS.forEach(c=>ro.observe(c.el.querySelector('.scene')))}
+else{setInterval(()=>{const c=CARDS[S.active];if(c)fit(c)},300)}
 
 /* test hooks */
 window.__cards=()=>CARDS.map(c=>c.id);window.__C=()=>CARDS;
